@@ -1,0 +1,15 @@
+FROM ruby:4.0.3
+ENV LANG C.UTF-8
+ENV TZ Asia/Tokyo
+
+# node.jsやらyarnやらなんやらをシステム全体にインストール
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
+# ディレクトリを作成してそれを作業ディレクトリ（Dockerが操作するディレクトリ）に設定
+RUN mkdir /myapp
+WORKDIR /myapp
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler
+
+# Dockerfileが存在するディレクトリ内（コンテナの外。今回の場合はRailsのアプリがあるディレクトリ）
+# にあるすべてのファイルとサブディレクトリをコンテナ内の/myappにコピー
+COPY . /myapp
