@@ -1,0 +1,20 @@
+<% content_for :title, title %>
+
+<section class="prototype-shell" aria-label="<%= title %>">
+  <div class="prototype-stage">
+    <%= image_tag "prototypes/transit-map/#{image_name}",
+          alt: title,
+          class: "prototype-image",
+          draggable: false %>
+
+    <nav class="prototype-hotspots" aria-label="Prototype navigation">
+      <% hotspots.each do |hotspot| %>
+        <%= link_to "",
+              hotspot.fetch(:path),
+              class: "prototype-hotspot",
+              style: "--hotspot-left: #{hotspot.fetch(:left)}%; --hotspot-top: #{hotspot.fetch(:top)}%; --hotspot-width: #{hotspot.fetch(:width)}%; --hotspot-height: #{hotspot.fetch(:height)}%;",
+              aria: { label: hotspot.fetch(:label) } %>
+      <% end %>
+    </nav>
+  </div>
+</section>

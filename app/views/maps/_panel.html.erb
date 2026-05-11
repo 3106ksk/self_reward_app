@@ -1,0 +1,92 @@
+<% active_subgoal = local_assigns[:subgoal] %>
+<% active_todo = local_assigns[:todo_item] %>
+<% panel_goal = local_assigns[:goal] %>
+
+<aside class="goal-map-panel" aria-label="Goal tools">
+  <div class="goal-map-panel__brand">
+    <span class="goal-map-panel__mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" role="img">
+        <path class="goal-map-panel__map-scroll" d="M5.4 7.2c2.4-1.1 5.4-.7 8.4-.2 3 .5 6.1.9 8.6-.2 1.9-.8 3.7-.4 4.4.7v16.7c-.7-1.1-2.5-1.5-4.4-.7-2.5 1.1-5.6.7-8.6.2-3-.5-6-.9-8.4.2V7.2Z" />
+        <path class="goal-map-panel__map-roll goal-map-panel__map-roll--left" d="M5.4 7.2c-1.5.2-2.5 1.2-2.5 2.4v15.1c0 .9 1.2 1.3 2.5-.8V7.2Z" />
+        <path class="goal-map-panel__map-roll goal-map-panel__map-roll--right" d="M26.8 7.5c1.4.1 2.3 1 2.3 2.2v15c0 .9-1.1 1.2-2.3-.5V7.5Z" />
+        <path class="goal-map-panel__compass-ring" d="M16 10.2a5.9 5.9 0 1 1 0 11.8 5.9 5.9 0 0 1 0-11.8Z" />
+        <path class="goal-map-panel__compass-ticks" d="M16 8.7v3.2M16 20.3v3.2M7.6 16h3.2M21.2 16h3.2M10.1 10.1l2.2 2.2M19.7 19.7l2.2 2.2M21.9 10.1l-2.2 2.2M12.3 19.7l-2.2 2.2" />
+        <path class="goal-map-panel__compass-needle-main" d="M16 6.5 18.1 16 16 25.5 13.9 16 16 6.5Z" />
+        <path class="goal-map-panel__compass-needle-cross" d="M6.5 16 16 13.9 25.5 16 16 18.1 6.5 16Z" />
+        <circle class="goal-map-panel__compass-center" cx="16" cy="16" r="1.8" />
+      </svg>
+    </span>
+    <div>
+      <h1>ミチシルベ</h1>
+    </div>
+  </div>
+
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible">
+    <summary class="goal-map-panel__section-header">
+      <span class="goal-map-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </span>
+      <div>
+        <p>価値観設定</p>
+        <span>毎日の積み重ねの理由を整える</span>
+      </div>
+      <span class="goal-map-panel__chevron" aria-hidden="true"></span>
+    </summary>
+    <%= turbo_frame_tag "goal_value_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "goals/value_form", goal: panel_goal %>
+    <% end %>
+  </details>
+
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible">
+    <summary class="goal-map-panel__section-header">
+      <span class="goal-map-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 21V4.8c3.8-1.6 6.1 1.7 10 0v9.3c-3.9 1.7-6.2-1.6-10 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <div>
+        <p>目標設定</p>
+        <span>目的地と理想の状態を整える</span>
+      </div>
+      <span class="goal-map-panel__chevron" aria-hidden="true"></span>
+    </summary>
+    <%= turbo_frame_tag "goal_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "goals/goal_form", goal: panel_goal %>
+    <% end %>
+  </details>
+
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible" <%= "open" if active_subgoal&.try(:persisted?) %>>
+    <summary class="goal-map-panel__section-header">
+      <span class="goal-map-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <div>
+        <p>サブゴールを追加</p>
+        <span>目的地までの通過点を増やす</span>
+      </div>
+      <span class="goal-map-panel__chevron" aria-hidden="true"></span>
+    </summary>
+    <%= turbo_frame_tag "subgoal_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "subgoals/form", subgoal: active_subgoal, goal: panel_goal %>
+    <% end %>
+  </details>
+
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible" <%= "open" if active_todo&.try(:persisted?) %>>
+    <summary class="goal-map-panel__section-header">
+      <span class="goal-map-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 13.5 9 17 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <div>
+        <p>今日の一歩を記録</p>
+        <span>サブゴールにつながる行動を残す</span>
+      </div>
+      <span class="goal-map-panel__chevron" aria-hidden="true"></span>
+    </summary>
+    <%= turbo_frame_tag "todo_item_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "todo_items/form", todo_item: active_todo, goal: panel_goal %>
+    <% end %>
+  </details>
+
+  <div class="goal-map-panel__footer">
+    <span class="goal-map-panel__status-dot"></span>
+    <span>入力するとマップに反映されます</span>
+  </div>
+</aside>

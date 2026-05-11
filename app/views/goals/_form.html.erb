@@ -1,0 +1,34 @@
+<% goal_record = local_assigns[:goal] %>
+
+<% if goal_record %>
+  <%= form_with model: goal_record, url: goal_path(goal_record), method: :patch, class: "goal-map-form", data: { turbo_frame: "goal_form" } do |form| %>
+    <% if goal_record.errors.any? %>
+      <div class="goal-map-form__errors">
+        <% goal_record.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form.label :title, "目標" %>
+    <%= form.text_field :title, placeholder: "Webエンジニアに転職", autocomplete: "off" %>
+
+    <%= form.label :description, "目標の説明" %>
+    <%= form.text_field :description, placeholder: "理想の働き方を手に入れる", autocomplete: "off" %>
+
+    <%= form.label :value_statement, "価値観" %>
+    <%= form.text_area :value_statement, rows: 3, placeholder: "家族との時間を大切にする", autocomplete: "off" %>
+
+    <%= form.submit "目標と価値観を更新" %>
+  <% end %>
+<% else %>
+  <form class="goal-map-form">
+    <label>目標</label>
+    <input type="text" placeholder="Webエンジニアに転職">
+    <label>目標の説明</label>
+    <input type="text" placeholder="理想の働き方を手に入れる">
+    <label>価値観</label>
+    <textarea rows="3" placeholder="家族との時間を大切にする"></textarea>
+    <button type="button">目標と価値観を更新</button>
+  </form>
+<% end %>

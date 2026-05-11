@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 378.50390243530273
   },
   "right": {
     "id": "6add3e625ab9851d",
@@ -185,6 +185,33 @@
   },
   "active": "3ae27c833a8f396b",
   "lastOpenFiles": [
-    "concept_summary.md"
+    "tmp/pids/server.pid",
+    "tmp/cache/bootsnap/compile-cache-iseq/b4/f4b178d67f3eaf",
+    "app/views/goals/_value_form.html.erb",
+    "app/views/goals/_goal_form.html.erb",
+    "tmp/cache/bootsnap/compile-cache-iseq/0b/4f73beb02e378f",
+    "app/views/goals/_form.html.erb",
+    "app/views/goals",
+    "app/controllers/goals_controller.rb",
+    "tmp/cache/bootsnap/compile-cache-iseq/2a/548cc4ed484f3d",
+    "app/views/subgoals/_map_form.html.erb",
+    "tmp/cache/bootsnap/compile-cache-iseq/9e/1a9ac30c42d6de",
+    "concept_summary.md",
+    "README.md",
+    "design_tone_palette.md",
+    "app/assets/images/prototypes/transit-map/rest.png",
+    "app/assets/images/prototypes/transit-map/today.png",
+    "app/assets/images/prototypes/transit-map/onboarding.png",
+    "app/assets/images/prototypes/transit-map/home.png",
+    "docs/ui_prototypes/transit-map/implementation_plan.md",
+    "docs/ui_prototypes/transit-map/pages/rest.png",
+    "docs/ui_prototypes/transit-map/pages/today.png",
+    "docs/ui_prototypes/transit-map/pages/onboarding.png",
+    "docs/ui_prototypes/future-logbook/design.md",
+    "docs/ui_prototypes/study-base/design.md",
+    "docs/ui_prototypes/transit-map/design.md",
+    "docs/ui_prototypes/future-logbook/ui.png",
+    "docs/ui_prototypes/transit-map/ui.png",
+    "docs/ui_prototypes/study-base/ui.png"
   ]
 }

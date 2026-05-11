@@ -1,6 +1,26 @@
 Rails.application.routes.draw do
   resources :posts
-  root "posts#index"
+  root "maps#show"
+
+  resource :map, only: :show
+
+  resources :goals, only: :update do
+    resources :subgoals, only: :create
+  end
+
+  resources :subgoals, only: %i[ create edit update destroy ] do
+    patch :claim_reward, on: :member
+    resources :todo_items, only: :create
+  end
+
+  resources :todo_items, only: %i[ create edit update ] do
+    patch :toggle, on: :member
+  end
+
+  get "prototype" => "prototype#home"
+  get "prototype/onboarding" => "prototype#onboarding"
+  get "prototype/today" => "prototype#today"
+  get "prototype/rest" => "prototype#rest"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

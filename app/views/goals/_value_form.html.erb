@@ -1,0 +1,26 @@
+<% goal_record = local_assigns[:goal] %>
+
+<% if goal_record %>
+  <%= form_with model: goal_record, url: goal_path(goal_record), method: :patch, class: "goal-map-form", data: { turbo_frame: "goal_value_form" } do |form| %>
+    <% if goal_record.errors[:value_statement].any? %>
+      <div class="goal-map-form__errors">
+        <% goal_record.errors.full_messages_for(:value_statement).each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form.label :value_statement, "価値観" %>
+    <%= form.text_area :value_statement, rows: 4, placeholder: "家族との時間を大切にする", autocomplete: "off" %>
+
+    <%= form.hidden_field :title %>
+    <%= form.hidden_field :description %>
+    <%= form.submit "価値観を更新" %>
+  <% end %>
+<% else %>
+  <form class="goal-map-form">
+    <label>価値観</label>
+    <textarea rows="4" placeholder="家族との時間を大切にする"></textarea>
+    <button type="button">価値観を更新</button>
+  </form>
+<% end %>

@@ -1,0 +1,107 @@
+<% goal_object = local_assigns[:goal] %>
+<% subgoal_collection = Array(local_assigns[:subgoals]).presence || Array(goal_object&.try(:subgoals)) %>
+<% todo_collection = Array(local_assigns[:todo_items]).presence || Array(goal_object&.try(:todo_items)) %>
+<% route_nodes = subgoal_collection.first(5) %>
+<% route_nodes = Array.new(4) if route_nodes.empty? %>
+
+<section class="goal-map-board" aria-label="Goal route">
+  <div class="goal-map-board__value">
+    <span aria-hidden="true">♥</span>
+    <p><%= goal_object&.try(:value_statement).presence || goal_object&.try(:description).presence || "Small visible wins compound into the larger reward." %></p>
+  </div>
+
+  <div class="goal-map-route" style="--route-columns: <%= [route_nodes.size + 1, 2].max %>">
+    <div class="goal-map-route__line" aria-hidden="true"></div>
+
+    <% route_nodes.each_with_index do |subgoal, index| %>
+      <% subgoal_todos = todo_collection.select { |todo| todo.try(:subgoal_id) == subgoal.try(:id) } %>
+      <% incomplete_todos = subgoal_todos.reject { |todo| todo.respond_to?(:completed?) ? todo.completed? : todo.try(:completed_at).present? } %>
+      <% completed_subgoal_todos = subgoal_todos.select { |todo| todo.respond_to?(:completed?) ? todo.completed? : todo.try(:completed_at).present? } %>
+      <% visible_todos = incomplete_todos.last(3) %>
+      <% visible_completed_todos = completed_subgoal_todos.last(3) %>
+      <% edit_path = respond_to?(:edit_subgoal_path) && subgoal.try(:persisted?) ? edit_subgoal_path(subgoal) : "#" %>
+      <div class="goal-map-node-group <%= 'has-reward-point' if subgoal.try(:persisted?) && index < route_nodes.size - 1 %>">
+        <% if index.zero? %>
+          <span class="goal-map-current-label">現在地</span>
+        <% end %>
+        <%= link_to edit_path,
+          class: "goal-map-node #{'is-current' if index.zero?}",
+          data: { turbo_frame: "subgoal_form", goal_map_target: "node", action: "click->goal-map#select" },
+          aria: { label: "Edit #{subgoal.try(:title).presence || "subgoal"}" } do %>
+          <span><%= index + 1 %></span>
+        <% end %>
+        <h2><%= subgoal.try(:title).presence || subgoal.try(:name).presence || "サブゴール #{index + 1}" %></h2>
+        <% if subgoal.try(:description).present? %>
+          <p class="goal-map-node-group__description"><%= subgoal.description %></p>
+        <% end %>
+
+        <div class="goal-map-todos">
+          <p class="goal-map-todos__label"><%= index.zero? ? "今日の一歩" : "次の一歩の例" %></p>
+          <% visible_todos.each do |todo| %>
+            <% todo_path = respond_to?(:edit_todo_item_path) && todo.try(:persisted?) ? edit_todo_item_path(todo) : "#" %>
+            <div class="goal-map-todo-card">
+              <%= button_to toggle_todo_item_path(todo),
+                method: :patch,
+                class: "goal-map-todo-card__check",
+                form: { data: { turbo_frame: "goal-map-board" } },
+                aria: { label: "#{todo.try(:title).presence || "Todo"}を完了にする" } do %>
+                <span aria-hidden="true"></span>
+              <% end %>
+              <%= link_to todo_path,
+                class: "goal-map-todo-card__title",
+                data: { turbo_frame: "todo_item_form", action: "click->goal-map#select" } do %>
+                <%= todo.try(:title).presence || todo.try(:name).presence || "今日の一歩" %>
+              <% end %>
+            </div>
+          <% end %>
+          <% if subgoal_todos.empty? && !subgoal.try(:persisted?) %>
+            <span class="goal-map-todo-card goal-map-todo-card--ghost">
+              <span class="goal-map-todo-card__check" aria-hidden="true"></span>
+              <span>今日の一歩</span>
+            </span>
+          <% end %>
+          <% if visible_completed_todos.any? %>
+            <div class="goal-map-completed-todos">
+              <p class="goal-map-completed-todos__label">完了タスク</p>
+              <% visible_completed_todos.each do |todo| %>
+                <%= link_to edit_todo_item_path(todo),
+                  class: "goal-map-completed-todo",
+                  data: { turbo_frame: "todo_item_form", action: "click->goal-map#select" } do %>
+                  <span aria-hidden="true">✓</span>
+                  <%= todo.try(:title).presence || "完了した一歩" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <% if subgoal.try(:persisted?) && index < route_nodes.size - 1 %>
+          <% reward_status_class = if subgoal.reward_claimed?
+            "is-claimed"
+          elsif subgoal.reward_available?
+            "is-available"
+          else
+            "is-locked"
+          end %>
+          <div class="goal-map-reward-point <%= reward_status_class %>" title="<%= subgoal.reward_label %>">
+            <%= link_to edit_subgoal_path(subgoal),
+              class: "goal-map-reward-point__marker",
+              data: { turbo_frame: "subgoal_form", action: "click->goal-map#selectReward" },
+              aria: { label: "#{subgoal.reward_label} #{subgoal.reward_claimed? ? "獲得済み" : "ご褒美ポイントを編集"}" } do %>
+              <svg viewBox="0 0 24 24"><path d="M6 8h12v12H6V8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 8v12M5 8h14M8.5 8c-1.5-1.7-.5-4 1.3-4 1.6 0 2.2 1.8 2.2 4 0-2.2.6-4 2.2-4 1.8 0 2.8 2.3 1.3 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <% end %>
+            <span class="goal-map-reward-point__caption">
+              <%= subgoal.reward_claimed? ? "獲得済み" : (subgoal.reward_available? ? "獲得可" : "ご褒美") %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="goal-map-goal-marker">
+      <span aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 21V4.8c3.8-1.6 6.1 1.7 10 0v9.3c-3.9 1.7-6.2-1.6-10 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <strong><%= goal_object&.try(:title).presence || "目的地" %></strong>
+    </div>
+  </div>
+</section>
