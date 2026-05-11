@@ -14,7 +14,7 @@ class GoalMapTest < ActiveSupport::TestCase
 
     assert_includes goal.subgoals, first
     assert_includes goal.subgoals, second
-    assert_equal [first, second], goal.subgoals.to_a
+    assert_equal [ first, second ], goal.subgoals.to_a
   end
 
   test "subgoal owns ordered todo items" do
@@ -25,7 +25,7 @@ class GoalMapTest < ActiveSupport::TestCase
 
     assert_includes subgoal.todo_items, first
     assert_includes subgoal.todo_items, second
-    assert_equal [first, second], subgoal.todo_items.to_a
+    assert_equal [ first, second ], subgoal.todo_items.to_a
   end
 
   test "goal validates title and value statement" do
