@@ -2,7 +2,7 @@ class Subgoal < ApplicationRecord
   MAX_PER_GOAL = 5
 
   belongs_to :goal, inverse_of: :subgoals
-  has_many :todo_items, -> { ordered }, dependent: :destroy, inverse_of: :subgoal
+  has_many :quests, -> { ordered }, dependent: :destroy, inverse_of: :subgoal
 
   validates :title, presence: true
   validates :position, presence: true, numericality: { only_integer: true }
@@ -11,7 +11,7 @@ class Subgoal < ApplicationRecord
   scope :ordered, -> { order(position: :asc, created_at: :asc, id: :asc) }
 
   def completed?
-    todo_items.loaded? ? todo_items.any? && todo_items.all?(&:completed?) : todo_items.exists? && todo_items.incomplete.none?
+    quests.loaded? ? quests.any? && quests.all?(&:completed?) : quests.exists? && quests.incomplete.none?
   end
 
   def reward_available?

@@ -18,7 +18,7 @@ def seed_assign(record, attributes)
   end
 end
 
-if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
+if defined?(Goal) && defined?(Subgoal) && defined?(Quest)
   goal_title_attribute = seed_attribute(Goal, :title, :name)
   goal_value_attribute = seed_attribute(Goal, :value_statement, :value, :description, :purpose)
   goal_position_attribute = seed_attribute(Goal, :position, :sort_order, :display_order)
@@ -26,9 +26,9 @@ if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
   subgoal_title_attribute = seed_attribute(Subgoal, :title, :name)
   subgoal_position_attribute = seed_attribute(Subgoal, :position, :sort_order, :display_order)
 
-  todo_title_attribute = seed_attribute(TodoItem, :title, :name, :body, :content)
-  todo_position_attribute = seed_attribute(TodoItem, :position, :sort_order, :display_order)
-  todo_completed_attribute = seed_attribute(TodoItem, :completed, :done)
+  quest_title_attribute = seed_attribute(Quest, :title, :name, :body, :content)
+  quest_position_attribute = seed_attribute(Quest, :position, :sort_order, :display_order)
+  quest_completed_attribute = seed_attribute(Quest, :completed, :done)
 
   goal = Goal.find_or_initialize_by(goal_title_attribute => "Webエンジニアに転職")
   seed_assign(
@@ -46,7 +46,7 @@ if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
       [
         "RailsガイドでMVCの流れを確認する",
         "CRUDアプリを1つ写経する",
-        "毎日30分、Rubyの復習をする"
+        "Rubyの基礎文法を30分復習する"
       ]
     ],
     [
@@ -55,7 +55,7 @@ if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
       "成果を形にできた自分を認める。",
       [
         "アプリの課題と利用者を1文で書く",
-        "Goal/Subgoal/TodoItemの基本機能を実装する",
+        "Goal/Subgoal/Questの基本機能を実装する",
         "READMEに使い方と工夫した点をまとめる"
       ]
     ],
@@ -69,7 +69,7 @@ if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
         "面接で話す開発エピソードを3つ整理する"
       ]
     ]
-  ].each.with_index(1) do |(subgoal_title, reward_title, reward_description, todo_titles), subgoal_index|
+  ].each.with_index(1) do |(subgoal_title, reward_title, reward_description, quest_titles), subgoal_index|
     subgoal = goal.subgoals.find_or_initialize_by(subgoal_title_attribute => subgoal_title)
     seed_assign(
       subgoal,
@@ -79,16 +79,16 @@ if defined?(Goal) && defined?(Subgoal) && defined?(TodoItem)
     )
     subgoal.save!
 
-    todo_titles.each.with_index(1) do |todo_title, todo_index|
-      todo_item = subgoal.todo_items.find_or_initialize_by(todo_title_attribute => todo_title)
+    quest_titles.each.with_index(1) do |quest_title, quest_index|
+      quest = subgoal.quests.find_or_initialize_by(quest_title_attribute => quest_title)
       seed_assign(
-        todo_item,
-        todo_position_attribute => todo_index,
-        todo_completed_attribute => false
+        quest,
+        quest_position_attribute => quest_index,
+        quest_completed_attribute => false
       )
-      todo_item.save!
+      quest.save!
     end
   end
 else
-  warn "Skipping goal-map seed data because Goal, Subgoal, or TodoItem is not defined yet."
+  warn "Skipping goal-map seed data because Goal, Subgoal, or Quest is not defined yet."
 end

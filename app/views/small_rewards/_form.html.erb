@@ -1,0 +1,45 @@
+<% small_reward ||= nil %>
+<% reward_record = small_reward || (defined?(SmallReward) ? SmallReward.new : nil) %>
+<% goal_record = local_assigns[:goal] || reward_record&.try(:goal) %>
+<% small_rewards = Array(goal_record&.try(:small_rewards)).select { |reward| reward.try(:persisted?) } %>
+<% form_url = if reward_record&.try(:persisted?) && respond_to?(:small_reward_path)
+  small_reward_path(reward_record)
+elsif respond_to?(:small_rewards_path)
+  small_rewards_path
+else
+  "#"
+end %>
+
+<% if reward_record %>
+  <%= form_with model: reward_record, url: form_url, method: (reward_record.persisted? ? :patch : :post), class: "goal-map-form", data: { turbo_frame: "small_reward_form" } do |form| %>
+    <% if reward_record.errors.any? %>
+      <div class="goal-map-form__errors">
+        <% reward_record.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form.label :title, "ご褒美名" %>
+    <%= form.text_field :title, placeholder: "例: 10分休む、好きな飲み物を用意する", autocomplete: "off" %>
+
+    <%= form.submit reward_record.persisted? ? "更新" : "小さなご褒美を追加" %>
+  <% end %>
+<% else %>
+  <form class="goal-map-form">
+    <label>ご褒美名</label>
+    <input type="text" placeholder="例: 10分休む、好きな飲み物を用意する">
+    <button type="button">小さなご褒美を追加</button>
+  </form>
+<% end %>
+
+<% if small_rewards.any? %>
+  <div class="goal-map-form__list" aria-label="小さなご褒美リスト">
+    <% small_rewards.each do |small_reward_item| %>
+      <% reward_path = respond_to?(:edit_small_reward_path) ? edit_small_reward_path(small_reward_item) : "#" %>
+      <%= link_to reward_path, class: "goal-map-form__list-item", data: { turbo_frame: "small_reward_form" } do %>
+        <span><%= small_reward_item.title %></span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

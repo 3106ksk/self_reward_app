@@ -2,31 +2,31 @@ require "test_helper"
 
 class GoalMapTest < ActiveSupport::TestCase
   setup do
-    TodoItem.delete_all
+    Quest.delete_all
+    SmallReward.delete_all
     Subgoal.delete_all
     Goal.delete_all
     User.delete_all
   end
 
-  test "goal owns ordered subgoals" do
+  test "goal owns ordered subgoals, quests, and small rewards" do
     goal = create_goal!("Webエンジニアに転職")
-    second = create_subgoal!(goal, "ポートフォリオを作る", position: 2)
-    first = create_subgoal!(goal, "Rails基礎を学ぶ", position: 1)
+    second = create_subgoal_for!(goal, title: "ポートフォリオを作る", position: 2)
+    first = create_subgoal_for!(goal, title: "Rails基礎を学ぶ", position: 1)
+    reward = create_small_reward_for!(goal, title: "散歩する")
 
-    assert_includes goal.subgoals, first
-    assert_includes goal.subgoals, second
     assert_equal [ first, second ], goal.subgoals.to_a
+    assert_includes goal.small_rewards, reward
   end
 
-  test "subgoal owns ordered todo items" do
-    goal = create_goal!("Webエンジニアに転職")
-    subgoal = create_subgoal!(goal, "Rails基礎を学ぶ")
-    second = create_todo_item!(subgoal, "CRUDアプリを1つ写経する", position: 2)
-    first = create_todo_item!(subgoal, "RailsガイドでMVCの流れを確認する", position: 1)
+  test "subgoal owns ordered quests" do
+    subgoal = create_subgoal_for!(create_goal!("Webエンジニアに転職"))
+    second = create_quest_for!(subgoal, title: "CRUDアプリを1つ写経する", position: 2)
+    first = create_quest_for!(subgoal, title: "RailsガイドでMVCの流れを確認する", position: 1)
 
-    assert_includes subgoal.todo_items, first
-    assert_includes subgoal.todo_items, second
-    assert_equal [ first, second ], subgoal.todo_items.to_a
+    assert_includes subgoal.quests, first
+    assert_includes subgoal.quests, second
+    assert_equal [ first, second ], subgoal.quests.to_a
   end
 
   test "goal validates title and value statement" do
@@ -74,7 +74,7 @@ class GoalMapTest < ActiveSupport::TestCase
   test "goal can have at most five subgoals" do
     goal = create_goal!("Webエンジニアに転職")
     5.times do |index|
-      create_subgoal!(goal, "サブゴール#{index + 1}", position: index + 1)
+      create_subgoal_for!(goal, title: "サブゴール#{index + 1}", position: index + 1)
     end
 
     sixth = goal.subgoals.build(title: "サブゴール6", description: "多すぎる", position: 6)
@@ -83,42 +83,67 @@ class GoalMapTest < ActiveSupport::TestCase
     assert sixth.errors[:base].present?
   end
 
-  test "todo item validates title and position" do
-    todo_item = TodoItem.new(title: nil, position: nil)
+  test "quest validates title and position" do
+    quest = Quest.new(title: nil, position: nil)
 
-    assert_not todo_item.valid?
-    assert todo_item.errors[:title].present?
-    assert todo_item.errors[:position].present?
+    assert_not quest.valid?
+    assert quest.errors[:title].present?
+    assert quest.errors[:position].present?
   end
 
-  test "todo item completion is derived from completed_at" do
-    subgoal = create_subgoal!(create_goal!("Webエンジニアに転職"), "Rails基礎を学ぶ")
-    todo_item = create_todo_item!(subgoal, "フォームを作る")
+  test "small reward validates title and belongs to goal" do
+    reward = SmallReward.new(title: nil)
 
-    assert_not todo_item.completed?
-
-    todo_item.update!(completed_at: Time.current)
-
-    assert todo_item.completed?
-    assert_equal true, todo_item.completed
+    assert_not reward.valid?
+    assert reward.errors[:title].present?
+    assert reward.errors[:goal].present?
   end
 
-  test "reward becomes available after every todo is complete" do
-    subgoal = create_subgoal!(create_goal!("Webエンジニアに転職"), "Rails基礎を学ぶ")
-    first = create_todo_item!(subgoal, "CRUDアプリを1つ写経する")
-    second = create_todo_item!(subgoal, "フォームを1画面作る", position: 2)
+  test "quest completion is derived from completed_at" do
+    subgoal = create_subgoal_for!(create_goal!("Webエンジニアに転職"))
+    quest = create_quest_for!(subgoal, title: "フォームを作る")
+
+    assert_not quest.completed?
+
+    quest.update!(completed_at: Time.current)
+
+    assert quest.completed?
+    assert_equal true, quest.completed
+  end
+
+  test "quest can be linked to a selected small reward" do
+    goal = create_goal!("Webエンジニアに転職")
+    subgoal = create_subgoal_for!(goal)
+    reward = create_small_reward_for!(goal, title: "散歩する")
+    quest = create_quest_for!(subgoal, title: "フォームを作る")
+
+    quest.update!(
+      completed_at: Time.current,
+      small_reward: reward,
+      small_reward_claimed_at: Time.current
+    )
+
+    assert_equal reward, quest.reload.small_reward
+    assert quest.small_reward_claimed_at.present?
+  end
+
+  test "big reward becomes available only after every quest is complete" do
+    subgoal = create_subgoal_for!(create_goal!("Webエンジニアに転職"))
+    first = create_quest_for!(subgoal, title: "CRUDアプリを1つ写経する")
+    second = create_quest_for!(subgoal, title: "フォームを1画面作る", position: 2)
 
     assert_not subgoal.completed?
     assert_not subgoal.reward_available?
 
     first.update!(completed_at: Time.current)
-    second.update!(completed_at: Time.current)
+    assert_not subgoal.reload.completed?
+    assert_not subgoal.reward_available?
 
+    second.update!(completed_at: Time.current)
     assert subgoal.reload.completed?
     assert subgoal.reward_available?
 
     subgoal.update!(reward_claimed_at: Time.current)
-
     assert subgoal.reward_claimed?
     assert_not subgoal.reward_available?
   end
@@ -127,19 +152,5 @@ class GoalMapTest < ActiveSupport::TestCase
 
   def create_goal!(title)
     create_goal_for!(create_user!, title: title)
-  end
-
-  def create_subgoal!(goal, title, position: 1)
-    goal.subgoals.create!(
-      title: title,
-      description: "基礎を固める",
-      position: position,
-      reward_title: "好きなカフェで休む",
-      reward_description: "ここまで進んだ区切り"
-    )
-  end
-
-  def create_todo_item!(subgoal, title, position: 1)
-    subgoal.todo_items.create!(title: title, memo: "今日 10:45", position: position)
   end
 end

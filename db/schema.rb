@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,10 +24,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_000001) do
     t.index ["user_id"], name: "index_goals_on_user_id", unique: true
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.string "title"
+  create_table "quests", force: :cascade do |t|
+    t.bigint "subgoal_id", null: false
+    t.string "title", null: false
+    t.text "memo"
+    t.datetime "completed_at"
+    t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "small_reward_id"
+    t.datetime "small_reward_claimed_at"
+    t.index ["completed_at"], name: "index_quests_on_completed_at"
+    t.index ["small_reward_id"], name: "index_quests_on_small_reward_id"
+    t.index ["subgoal_id", "position"], name: "index_quests_on_subgoal_id_and_position"
+    t.index ["subgoal_id"], name: "index_quests_on_subgoal_id"
+  end
+
+  create_table "small_rewards", force: :cascade do |t|
+    t.bigint "goal_id", null: false
+    t.string "title", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_small_rewards_on_goal_id"
   end
 
   create_table "subgoals", force: :cascade do |t|
@@ -44,19 +62,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_000001) do
     t.index ["goal_id"], name: "index_subgoals_on_goal_id"
   end
 
-  create_table "todo_items", force: :cascade do |t|
-    t.bigint "subgoal_id", null: false
-    t.string "title", null: false
-    t.text "memo"
-    t.datetime "completed_at"
-    t.integer "position", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["completed_at"], name: "index_todo_items_on_completed_at"
-    t.index ["subgoal_id", "position"], name: "index_todo_items_on_subgoal_id_and_position"
-    t.index ["subgoal_id"], name: "index_todo_items_on_subgoal_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -67,6 +72,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_000001) do
   end
 
   add_foreign_key "goals", "users"
+  add_foreign_key "quests", "small_rewards"
+  add_foreign_key "quests", "subgoals"
+  add_foreign_key "small_rewards", "goals"
   add_foreign_key "subgoals", "goals"
-  add_foreign_key "todo_items", "subgoals"
 end

@@ -466,6 +466,32 @@ body {
   margin: 0;
 }
 
+.goal-map-form__list {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.goal-map-form__list-item {
+  display: block;
+  padding: 9px 10px;
+  border: 1px solid rgba(238, 245, 236, 0.12);
+  border-radius: 7px;
+  background: rgba(238, 245, 236, 0.08);
+  color: #f7fbf4;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.goal-map-form__list-item:hover,
+.goal-map-form__list-item:focus-visible {
+  border-color: rgba(88, 201, 139, 0.72);
+  background: rgba(238, 245, 236, 0.12);
+  outline: none;
+}
+
 .goal-map-form button,
 .goal-map-form input[type="submit"],
 .goal-map-form__secondary-button,

@@ -27,6 +27,31 @@ module ActiveSupport
         description: "理想の働き方を手に入れる"
       )
     end
+
+    def create_subgoal_for!(goal, title: "Rails基礎を学ぶ", position: 1)
+      goal.subgoals.create!(
+        title: title,
+        description: "基礎を固める",
+        position: position,
+        reward_title: "好きなカフェで休む",
+        reward_description: "ここまで進んだ区切り"
+      )
+    end
+
+    def create_quest_for!(subgoal, title: "RailsガイドでMVCの流れを確認する", position: 1, completed_at: nil, small_reward: nil)
+      subgoal.quests.create!(
+        title: title,
+        description: "クリア条件を満たす",
+        position: position,
+        completed_at: completed_at,
+        small_reward: small_reward,
+        small_reward_claimed_at: small_reward.present? ? Time.current : nil
+      )
+    end
+
+    def create_small_reward_for!(goal, title: "好きなドリンクを飲む")
+      goal.small_rewards.create!(title: title)
+    end
   end
 end
 

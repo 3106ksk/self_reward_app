@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "quest_form" do %>
+  <%= render "form", quest: @quest, goal: @quest.subgoal.goal %>
+<% end %>

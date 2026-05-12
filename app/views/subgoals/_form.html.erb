@@ -25,25 +25,23 @@ end %>
       <div class="goal-map-form__mode">
         <span>編集中</span>
         <strong><%= subgoal_record.reward_label %></strong>
-        <small>サブゴールとご褒美をここで編集できます</small>
+        <small>サブゴールと大きなご褒美をここで編集できます</small>
       </div>
     <% elsif max_reached %>
       <p class="goal-map-form__note goal-map-form__note--limit">サブゴールは最大<%= max_subgoals %>つまでです。追加するには、不要なサブゴールを削除してください。</p>
     <% end %>
-    <%= form.label :title, "つながるサブ目標" %>
-    <%= form.text_field :title, placeholder: "企画を形にする", autocomplete: "off" %>
-    <%= form.label :description, "メモ" %>
-    <%= form.text_field :description, placeholder: "どんな状態まで進める？", autocomplete: "off" %>
-    <%= form.label :position, "順番" %>
-    <%= form.number_field :position, min: 1, placeholder: "1" %>
-    <%= form.label :reward_title, "ご褒美ポイント" %>
-    <%= form.text_field :reward_title, placeholder: "好きなカフェで休む", autocomplete: "off" %>
-    <%= form.label :reward_description, "ご褒美メモ" %>
-    <%= form.text_field :reward_description, placeholder: "ここまで進んだ区切り", autocomplete: "off" %>
+    <%= form.label :title, "サブゴール名" %>
+    <%= form.text_field :title, placeholder: "例: 最初の機能を画面で動かせるようにする", autocomplete: "off" %>
+    <%= form.label :description, "説明、メモ" %>
+    <%= form.text_field :description, placeholder: "例: このサブゴールで到達したい状態", autocomplete: "off" %>
+    <%= form.label :reward_title, "大きなご褒美" %>
+    <%= form.text_field :reward_title, placeholder: "例: 達成したら受け取れるご褒美", autocomplete: "off" %>
+    <%= form.label :reward_description, "大きなご褒美の説明、メモ" %>
+    <%= form.text_field :reward_description, placeholder: "例: いつ、どんな気持ちで受け取るか", autocomplete: "off" %>
     <% if subgoal_record.persisted? && subgoal_record.reward_claimed? %>
-      <p class="goal-map-form__note">このご褒美は獲得済みです。</p>
+      <p class="goal-map-form__note">この大きなご褒美は獲得済みです。</p>
     <% elsif subgoal_record.persisted? && subgoal_record.reward_available? %>
-      <p class="goal-map-form__note">サブゴール完了。ご褒美を獲得できます。</p>
+      <p class="goal-map-form__note">サブゴール達成。大きなご褒美を獲得できます。</p>
     <% end %>
     <%= form.submit subgoal_record.persisted? ? "更新" : "サブゴールを追加", disabled: max_reached %>
   <% end %>
@@ -52,10 +50,10 @@ end %>
       subgoal_path(subgoal_record),
       method: :delete,
       class: "goal-map-form__danger-button",
-      form: { data: { turbo_confirm: "このサブゴールと紐づくTodoを削除します。よろしいですか？" } } %>
+      form: { data: { turbo_confirm: "このサブゴールと紐づくクエストを削除します。よろしいですか？" } } %>
   <% end %>
   <% if subgoal_record.persisted? && subgoal_record.reward_available? %>
-    <%= button_to "ご褒美を獲得する",
+    <%= button_to "大きなご褒美を獲得する",
       claim_reward_subgoal_path(subgoal_record),
       method: :patch,
       class: "goal-map-form__secondary-button",
@@ -63,16 +61,14 @@ end %>
   <% end %>
 <% else %>
   <form class="goal-map-form">
-    <label>つながるサブ目標</label>
-    <input type="text" placeholder="企画を形にする">
-    <label>メモ</label>
-    <input type="text" placeholder="どんな状態まで進める？">
-    <label>順番</label>
-    <input type="number" min="1" placeholder="1">
-    <label>ご褒美ポイント</label>
-    <input type="text" placeholder="好きなカフェで休む">
-    <label>ご褒美メモ</label>
-    <input type="text" placeholder="ここまで進んだ区切り">
+    <label>サブゴール名</label>
+    <input type="text" placeholder="例: 最初の機能を画面で動かせるようにする">
+    <label>説明、メモ</label>
+    <input type="text" placeholder="例: このサブゴールで到達したい状態">
+    <label>大きなご褒美</label>
+    <input type="text" placeholder="例: 達成したら受け取れるご褒美">
+    <label>大きなご褒美の説明、メモ</label>
+    <input type="text" placeholder="例: いつ、どんな気持ちで受け取るか">
     <button type="button">サブゴールを追加</button>
   </form>
 <% end %>

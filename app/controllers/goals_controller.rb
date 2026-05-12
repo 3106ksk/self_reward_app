@@ -31,16 +31,18 @@ class GoalsController < ApplicationController
 
   def load_goal_map
     @map = @goal
-    @subgoals = @goal.subgoals.ordered.includes(:todo_items)
-    @todo_items = TodoItem.where(subgoal_id: @subgoals.select(:id)).ordered
+    @subgoals = @goal.subgoals.ordered.includes(:quests)
+    @quests = Quest.where(subgoal_id: @subgoals.select(:id)).ordered
     @subgoal = Subgoal.new(goal: @goal, position: next_position(@goal.subgoals))
-    @todo_item = TodoItem.new(position: 1)
+    @quest = Quest.new(position: 1)
+    @small_reward = SmallReward.new(goal: @goal)
+    @small_rewards = @goal.small_rewards.order(created_at: :asc, id: :asc)
   end
 
   def render_goal_stream(goal:, status: :ok)
     render turbo_stream: [
       turbo_stream.replace("goal-map-board", helpers.turbo_frame_tag("goal-map-board", class: "goal-map-board-frame") {
-        render_to_string(partial: "maps/map", formats: [ :html ], locals: { map: @map, goal: @goal, subgoals: @subgoals, todo_items: @todo_items })
+        render_to_string(partial: "maps/map", formats: [ :html ], locals: { map: @map, goal: @goal, subgoals: @subgoals, quests: @quests })
       }),
       turbo_stream.replace("goal_form", helpers.turbo_frame_tag("goal_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" }) {
         render_to_string(partial: "goals/goal_form", formats: [ :html ], locals: { goal: goal })

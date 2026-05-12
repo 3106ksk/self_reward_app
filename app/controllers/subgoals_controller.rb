@@ -4,7 +4,7 @@ class SubgoalsController < ApplicationController
 
   def create
     @subgoal = @goal.subgoals.build(subgoal_params)
-    @subgoal.position ||= next_position(@goal.subgoals)
+    @subgoal.position = next_position(@goal.subgoals)
 
     if @subgoal.save
       load_goal_map(subgoal: Subgoal.new(goal: @goal, position: next_position(@goal.subgoals)))
@@ -60,7 +60,7 @@ class SubgoalsController < ApplicationController
     load_goal_map(subgoal: Subgoal.new(goal: @goal, position: next_position(@goal.subgoals)))
     respond_to do |format|
       format.turbo_stream { render_goal_map_stream(form_frame: "subgoal_form", form_partial: "subgoals/form", form_locals: { subgoal: @subgoal, map: @map, goal: @goal }) }
-      format.html { redirect_to root_path, notice: "Reward point was successfully claimed.", status: :see_other }
+        format.html { redirect_to root_path, notice: "大きなご褒美を獲得しました。", status: :see_other }
     end
   end
 
@@ -79,23 +79,25 @@ class SubgoalsController < ApplicationController
   end
 
   def subgoal_params
-    params.expect(subgoal: [ :title, :description, :position, :reward_title, :reward_description ])
+    params.expect(subgoal: [ :title, :description, :reward_title, :reward_description ])
   end
 
   def load_goal_map(subgoal: nil)
     @goal ||= default_goal
     @map = @goal
-    @subgoals = @goal.subgoals.ordered.includes(:todo_items)
-    @todo_items = TodoItem.where(subgoal_id: @subgoals.select(:id)).ordered
+    @subgoals = @goal.subgoals.ordered.includes(:quests)
+    @quests = Quest.where(subgoal_id: @subgoals.select(:id)).ordered
     @subgoal = subgoal || Subgoal.new(goal: @goal, position: next_position(@goal.subgoals))
-    @todo_item = TodoItem.new(position: 1)
+    @quest = Quest.new(position: 1)
+    @small_reward = SmallReward.new(goal: @goal)
+    @small_rewards = @goal.small_rewards.order(created_at: :asc, id: :asc)
   end
 
   def default_goal
     @default_goal ||= current_user.goal || current_user.create_goal!(
-      title: "目標を設定しましょう",
-      value_statement: "今日の一歩が、目指したい未来につながっています。",
-      description: "大きな目標、サブゴール、今日のTodoを設定して、道のりを見える形にしましょう。"
+      title: "まずは長期ゴールを入力してください",
+      value_statement: "このゴールを目指す理由や、大切にしたい価値観を書いてください。",
+      description: "ゴールを達成したときの状態や、実現したい暮らしを書いてください。"
     )
   end
 
@@ -106,13 +108,13 @@ class SubgoalsController < ApplicationController
   def render_goal_map_stream(form_frame:, form_partial:, form_locals:, status: :ok)
     render turbo_stream: [
       turbo_stream.replace("goal-map-board", helpers.turbo_frame_tag("goal-map-board", class: "goal-map-board-frame") {
-        render_to_string(partial: "maps/map", formats: [ :html ], locals: { map: @map, goal: @goal, subgoals: @subgoals, todo_items: @todo_items })
+        render_to_string(partial: "maps/map", formats: [ :html ], locals: { map: @map, goal: @goal, subgoals: @subgoals, quests: @quests })
       }),
       turbo_stream.replace(form_frame, helpers.turbo_frame_tag(form_frame) {
         render_to_string(partial: form_partial, formats: [ :html ], locals: form_locals)
       }),
-      turbo_stream.replace("todo_item_form", helpers.turbo_frame_tag("todo_item_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" }) {
-        render_to_string(partial: "todo_items/form", formats: [ :html ], locals: { todo_item: @todo_item, map: @map, goal: @goal })
+      turbo_stream.replace("quest_form", helpers.turbo_frame_tag("quest_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" }) {
+        render_to_string(partial: "quests/form", formats: [ :html ], locals: { quest: @quest, map: @map, goal: @goal })
       })
     ], status: status
   end

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["node", "subgoalSelect", "completedCheckbox"]
+  static targets = ["node", "questSubgoalSelect", "completedCheckbox"]
 
   connect() {
     requestAnimationFrame(() => {
@@ -64,7 +64,7 @@ export default class extends Controller {
     }
   }
 
-  changeTodoSubgoal(event) {
+  changeQuestSubgoal(event) {
     const form = event.target.closest("form")
 
     if (form && event.target.value) {

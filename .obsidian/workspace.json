@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "concept_summary.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "concept_summary"
             }
           }
         ]
@@ -186,18 +186,21 @@
   "active": "3ae27c833a8f396b",
   "lastOpenFiles": [
     "tmp/pids/server.pid",
-    "tmp/cache/bootsnap/compile-cache-iseq/b4/f4b178d67f3eaf",
-    "app/views/goals/_value_form.html.erb",
-    "app/views/goals/_goal_form.html.erb",
-    "tmp/cache/bootsnap/compile-cache-iseq/0b/4f73beb02e378f",
-    "app/views/goals/_form.html.erb",
-    "app/views/goals",
-    "app/controllers/goals_controller.rb",
-    "tmp/cache/bootsnap/compile-cache-iseq/2a/548cc4ed484f3d",
-    "app/views/subgoals/_map_form.html.erb",
-    "tmp/cache/bootsnap/compile-cache-iseq/9e/1a9ac30c42d6de",
-    "concept_summary.md",
+    "tmp/cache/bootsnap/compile-cache-iseq/34/153ac164298d9c",
+    "tmp/cache/bootsnap/compile-cache-iseq/ba/c189f711ba990d",
+    "tmp/cache/bootsnap/compile-cache-iseq/6c/19f8e7a75812e7",
+    "tmp/cache/bootsnap/compile-cache-iseq/22/a56c2ac0495c5c",
+    "tmp/cache/bootsnap/compile-cache-iseq/23/ea36336cc296a2",
+    "tmp/cache/bootsnap/compile-cache-iseq/48/eb791f30a1e1f3",
+    "tmp/cache/bootsnap/compile-cache-iseq/2c/e9b1c0013c652f",
+    "tmp/cache/bootsnap/compile-cache-iseq/ab/01b727548db8ad",
+    "tmp/cache/bootsnap/compile-cache-iseq/33/e7f83bc3a8900b",
+    "tmp/cache/bootsnap/compile-cache-iseq/86/3e14f6db2d0370",
+    "docs/mvp_implementation_prompt.md",
+    "docs/mvp_implementation_design.md",
+    "docs/concept_decision_log.md",
     "README.md",
+    "concept_summary.md",
     "design_tone_palette.md",
     "app/assets/images/prototypes/transit-map/rest.png",
     "app/assets/images/prototypes/transit-map/today.png",

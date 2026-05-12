@@ -1,8 +1,9 @@
 <% active_subgoal = local_assigns[:subgoal] %>
-<% active_todo = local_assigns[:todo_item] %>
+<% active_quest = local_assigns[:quest] %>
+<% active_small_reward = local_assigns[:small_reward] %>
 <% panel_goal = local_assigns[:goal] %>
 
-<aside class="goal-map-panel" aria-label="Goal tools">
+<aside class="goal-map-panel" aria-label="設定パネル">
   <div class="goal-map-panel__brand">
     <span class="goal-map-panel__mark" aria-hidden="true">
       <svg viewBox="0 0 32 32" role="img">
@@ -28,7 +29,7 @@
       </span>
       <div>
         <p>価値観設定</p>
-        <span>毎日の積み重ねの理由を整える</span>
+        <span>クエストに向かう理由を整える</span>
       </div>
       <span class="goal-map-panel__chevron" aria-hidden="true"></span>
     </summary>
@@ -43,7 +44,7 @@
         <svg viewBox="0 0 24 24"><path d="M6 21V4.8c3.8-1.6 6.1 1.7 10 0v9.3c-3.9 1.7-6.2-1.6-10 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
       <div>
-        <p>目標設定</p>
+        <p>長期ゴール設定</p>
         <span>目的地と理想の状態を整える</span>
       </div>
       <span class="goal-map-panel__chevron" aria-hidden="true"></span>
@@ -59,7 +60,7 @@
         <svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </span>
       <div>
-        <p>サブゴールを追加</p>
+        <p>サブゴール設定</p>
         <span>目的地までの通過点を増やす</span>
       </div>
       <span class="goal-map-panel__chevron" aria-hidden="true"></span>
@@ -69,19 +70,35 @@
     <% end %>
   </details>
 
-  <details class="goal-map-panel__section goal-map-panel__section--collapsible" <%= "open" if active_todo&.try(:persisted?) %>>
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible" <%= "open" if active_quest&.try(:persisted?) %>>
     <summary class="goal-map-panel__section-header">
       <span class="goal-map-panel__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M5 13.5 9 17 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
       <div>
-        <p>今日の一歩を記録</p>
-        <span>サブゴールにつながる行動を残す</span>
+        <p>クエスト設定</p>
+        <span>サブゴール達成に必要なクエストを整える</span>
       </div>
       <span class="goal-map-panel__chevron" aria-hidden="true"></span>
     </summary>
-    <%= turbo_frame_tag "todo_item_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
-      <%= render "todo_items/form", todo_item: active_todo, goal: panel_goal %>
+    <%= turbo_frame_tag "quest_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "quests/form", quest: active_quest, goal: panel_goal %>
+    <% end %>
+  </details>
+
+  <details class="goal-map-panel__section goal-map-panel__section--collapsible" <%= "open" if active_small_reward&.try(:persisted?) %>>
+    <summary class="goal-map-panel__section-header">
+      <span class="goal-map-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 8h12v12H6V8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v12M5 8h14M8.5 8c-1.5-1.7-.5-4 1.3-4 1.6 0 2.2 1.8 2.2 4 0-2.2.6-4 2.2-4 1.8 0 2.8 2.3 1.3 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <div>
+        <p>小さなご褒美設定</p>
+        <span>クエストクリア時に選ぶご褒美を整える</span>
+      </div>
+      <span class="goal-map-panel__chevron" aria-hidden="true"></span>
+    </summary>
+    <%= turbo_frame_tag "small_reward_form", data: { action: "turbo:frame-render->goal-map#openPanelSection" } do %>
+      <%= render "small_rewards/form", small_reward: active_small_reward, goal: panel_goal %>
     <% end %>
   </details>
 

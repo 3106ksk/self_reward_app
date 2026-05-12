@@ -1,16 +1,20 @@
 require "test_helper"
 
 class MapsControllerTest < ActionDispatch::IntegrationTest
+  FORBIDDEN_SERVICE_COPY = [ "Todo", "今日のTodo", "今日やったこと", "今日の一歩", "完了タスク" ]
+
   setup do
-    TodoItem.delete_all
+    Quest.delete_all
+    SmallReward.delete_all
     Subgoal.delete_all
     Goal.delete_all
     User.delete_all
 
     @user = create_user!
     @goal = create_goal_for!(@user, title: "Webエンジニアに転職")
-    @subgoal = create_subgoal!(@goal, "Rails基礎を学ぶ")
-    @todo_item = create_todo_item!(@subgoal, "RailsガイドでMVCの流れを確認する")
+    @subgoal = create_subgoal_for!(@goal, title: "Rails基礎を学ぶ")
+    @small_reward = create_small_reward_for!(@goal, title: "好きなドリンクを飲む")
+    @quest = create_quest_for!(@subgoal, title: "RailsガイドでMVCの流れを確認する")
   end
 
   test "redirects root to login when logged out" do
@@ -19,25 +23,29 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
-  test "shows the goal map" do
+  test "shows the goal map with quest and reward language only" do
     log_in_as(@user)
 
     get root_path
 
     assert_response :success
     assert_match "ミチシルベ", response.body
-    assert_match "目標設定", response.body
+    assert_match "長期ゴール設定", response.body
     assert_match "価値観設定", response.body
     assert_match "Webエンジニアに転職", response.body
     assert_match "Rails基礎を学ぶ", response.body
     assert_match "RailsガイドでMVCの流れを確認する", response.body
+    assert_match "クエスト", response.body
+    assert_match "小さなご褒美", response.body
+    assert_match "大きなご褒美", response.body
+    FORBIDDEN_SERVICE_COPY.each { |copy| assert_no_match copy, response.body }
   end
 
-  test "creates one default goal for logged in user" do
+  test "creates one default goal for logged in user with quest language" do
     user = create_user!
-    expected_title = "目標を設定しましょう"
-    expected_value = "今日の一歩が、目指したい未来につながっています。"
-    expected_description = "大きな目標、サブゴール、今日のTodoを設定して、道のりを見える形にしましょう。"
+    expected_title = "まずは長期ゴールを入力してください"
+    expected_value = "このゴールを目指す理由や、大切にしたい価値観を書いてください。"
+    expected_description = "ゴールを達成したときの状態や、実現したい暮らしを書いてください。"
 
     log_in_as(user)
 
@@ -72,22 +80,6 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "家族との時間を最優先にする", @goal.value_statement
   end
 
-  test "updates only the value statement from the side panel" do
-    log_in_as(@user)
-
-    patch goal_path(@goal), params: {
-      goal: {
-        title: @goal.title,
-        description: @goal.description,
-        value_statement: "毎日の積み重ねを大切にする"
-      }
-    }
-
-    assert_response :see_other
-    assert_equal "Webエンジニアに転職", @goal.reload.title
-    assert_equal "毎日の積み重ねを大切にする", @goal.value_statement
-  end
-
   test "does not update goal without required values" do
     log_in_as(@user)
 
@@ -99,58 +91,55 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_match "can&#39;t be blank", response.body
   end
 
-  test "creates a subgoal from the side panel flow" do
+  test "creates a subgoal at the end even when position param is passed" do
     log_in_as(@user)
 
     assert_difference("@goal.subgoals.count", 1) do
       post goal_subgoals_path(@goal), params: {
-        subgoal: { title: "ポートフォリオを作る", description: "成果を形にする", position: 2 }
+        subgoal: { title: "ポートフォリオを作る", description: "成果を形にする", position: 1 }
       }
     end
 
     assert_response :see_other
-    assert_equal "ポートフォリオを作る", @goal.subgoals.ordered.last.title
+    created = @goal.subgoals.ordered.last
+    assert_equal "ポートフォリオを作る", created.title
+    assert_equal 2, created.position
   end
 
-  test "refreshes todo item form subgoal options after turbo subgoal create" do
+  test "subgoal and quest forms do not expose position or forbidden copy" do
+    log_in_as(@user)
+
+    get root_path
+
+    assert_response :success
+    assert_no_match(/name="subgoal\[position\]"/, response.body)
+    assert_no_match(/name="quest\[position\]"/, response.body)
+    assert_no_match ">順番<", response.body
+    FORBIDDEN_SERVICE_COPY.each { |copy| assert_no_match copy, response.body }
+  end
+
+  test "refreshes quest form subgoal options after turbo subgoal create" do
     other_user = create_user!
     other_goal = create_goal_for!(other_user, title: "他ユーザーの目標")
-    create_subgoal!(other_goal, "他ユーザーのサブゴール")
+    create_subgoal_for!(other_goal, title: "他ユーザーのサブゴール")
 
     log_in_as(@user)
 
     assert_difference("@goal.subgoals.count", 1) do
       post goal_subgoals_path(@goal),
         params: {
-          subgoal: { title: "ポートフォリオを作る", description: "成果を形にする", position: 2 }
+          subgoal: { title: "ポートフォリオを作る", description: "成果を形にする", position: 1 }
         },
         headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
     assert_response :success
-    assert_match "target=\"todo_item_form\"", response.body
+    assert_match "target=\"quest_form\"", response.body
     assert_match "ポートフォリオを作る", response.body
     assert_no_match "他ユーザーのサブゴール", response.body
   end
 
-  test "does not create more than five subgoals" do
-    log_in_as(@user)
-
-    4.times do |index|
-      create_subgoal!(@goal, "追加サブゴール#{index + 1}", position: index + 2)
-    end
-
-    assert_no_difference("@goal.subgoals.count") do
-      post goal_subgoals_path(@goal), params: {
-        subgoal: { title: "6つ目のサブゴール", description: "上限超過", position: 6 }
-      }
-    end
-
-    assert_response :unprocessable_entity
-    assert_match "サブゴールは最大5つまでです", response.body
-  end
-
-  test "edits and updates a subgoal from the map" do
+  test "edits and updates a subgoal from the map without changing position" do
     log_in_as(@user)
 
     get edit_subgoal_path(@subgoal)
@@ -158,20 +147,22 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "subgoal_form", response.body
     assert_match "Rails基礎を学ぶ", response.body
+    assert_no_match(/name="subgoal\[position\]"/, response.body)
 
     patch subgoal_path(@subgoal), params: {
-      subgoal: { title: "Rails基礎を終える", description: @subgoal.description, position: @subgoal.position }
+      subgoal: { title: "Rails基礎を終える", description: @subgoal.description, position: 99 }
     }
 
     assert_response :see_other
     assert_equal "Rails基礎を終える", @subgoal.reload.title
+    assert_equal 1, @subgoal.position
   end
 
-  test "deletes a subgoal and its todo items" do
+  test "deletes a subgoal and its quests" do
     log_in_as(@user)
 
     assert_difference("@goal.subgoals.count", -1) do
-      assert_difference("TodoItem.count", -1) do
+      assert_difference("Quest.count", -1) do
         delete subgoal_path(@subgoal)
       end
     end
@@ -180,65 +171,112 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_raises(ActiveRecord::RecordNotFound) { @subgoal.reload }
   end
 
-  test "creates a todo item under a subgoal" do
+  test "creates a quest under a subgoal at the end even when position param is passed" do
     log_in_as(@user)
 
-    assert_difference("@subgoal.todo_items.count", 1) do
-      post subgoal_todo_items_path(@subgoal), params: {
-        todo_item: { title: "フォームを1画面作った", memo: "今日 10:45", position: 2 }
+    assert_difference("@subgoal.quests.count", 1) do
+      post subgoal_quests_path(@subgoal), params: {
+        quest: { title: "フォームを1画面作った", description: "入力から保存まで確認", position: 1 }
       }
     end
 
     assert_response :see_other
-    assert_equal "フォームを1画面作った", @subgoal.todo_items.ordered.last.title
+    created = @subgoal.quests.ordered.last
+    assert_equal "フォームを1画面作った", created.title
+    assert_equal 2, created.position
   end
 
-  test "edits and updates a todo item from the map" do
+  test "edits and updates a quest from the map without changing position" do
     log_in_as(@user)
 
-    get edit_todo_item_path(@todo_item)
+    get edit_quest_path(@quest)
 
     assert_response :success
-    assert_match "todo_item_form", response.body
+    assert_match "quest_form", response.body
     assert_match "RailsガイドでMVCの流れを確認する", response.body
+    assert_no_match(/name="quest\[position\]"/, response.body)
 
-    patch todo_item_path(@todo_item), params: {
-      todo_item: { title: "MVCの流れを整理した", memo: "昨日 21:30", position: @todo_item.position }
+    patch quest_path(@quest), params: {
+      quest: { title: "MVCの流れを整理した", description: "ノートにまとめた", position: 99 }
     }
 
     assert_response :see_other
-    assert_equal "MVCの流れを整理した", @todo_item.reload.title
+    assert_equal "MVCの流れを整理した", @quest.reload.title
+    assert_equal 1, @quest.position
   end
 
-  test "toggles a todo item into the completed list" do
+  test "completes a quest with a selected small reward" do
     log_in_as(@user)
 
-    assert_not @todo_item.completed?
+    assert_not @quest.completed?
 
-    patch toggle_todo_item_path(@todo_item)
+    patch complete_quest_path(@quest), params: {
+      quest: { small_reward_id: @small_reward.id }
+    }
 
     assert_response :see_other
-    assert @todo_item.reload.completed?
+    @quest.reload
+    assert @quest.completed?
+    assert_equal @small_reward, @quest.small_reward
+    assert @quest.small_reward_claimed_at.present?
   end
 
-  test "claims an available reward point" do
+  test "uncompletes a quest and clears selected small reward" do
+    @quest.update!(
+      completed_at: Time.current,
+      small_reward: @small_reward,
+      small_reward_claimed_at: Time.current
+    )
     log_in_as(@user)
 
-    @subgoal.todo_items.update_all(completed_at: Time.current)
-
-    patch claim_reward_subgoal_path(@subgoal)
+    patch uncomplete_quest_path(@quest)
 
     assert_response :see_other
-    assert @subgoal.reload.reward_claimed?
+    @quest.reload
+    assert_not @quest.completed?
+    assert_nil @quest.small_reward
+    assert_nil @quest.small_reward_claimed_at
   end
 
-  test "does not claim a reward point before subgoal completion" do
+  test "creates and updates a small reward with title only" do
     log_in_as(@user)
 
+    assert_difference("@goal.small_rewards.count", 1) do
+      post small_rewards_path, params: {
+        small_reward: { title: "30分だけ動画を見る", memo: "保存しない", position: 1, active: false }
+      }
+    end
+
+    assert_response :see_other
+    reward = @goal.small_rewards.order(:created_at).last
+    assert_equal "30分だけ動画を見る", reward.title
+    assert_not reward.respond_to?(:memo)
+    assert_not reward.respond_to?(:position)
+    assert_not reward.respond_to?(:active)
+
+    patch small_reward_path(reward), params: {
+      small_reward: { title: "散歩する", memo: "保存しない" }
+    }
+
+    assert_response :see_other
+    assert_equal "散歩する", reward.reload.title
+  end
+
+  test "claims big reward only after all quests are complete" do
+    second_quest = create_quest_for!(@subgoal, title: "フォームを1画面作る", position: 2)
+    log_in_as(@user)
+
+    @quest.update!(completed_at: Time.current)
     patch claim_reward_subgoal_path(@subgoal)
 
     assert_response :see_other
     assert_not @subgoal.reload.reward_claimed?
+
+    second_quest.update!(completed_at: Time.current)
+    patch claim_reward_subgoal_path(@subgoal)
+
+    assert_response :see_other
+    assert @subgoal.reload.reward_claimed?
   end
 
   test "cannot update another user's goal" do
@@ -259,62 +297,41 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "他ユーザーの目標", other_goal.reload.title
   end
 
-  test "cannot operate another user's subgoal" do
+  test "cannot operate another user's quest" do
     other_user = create_user!
     other_goal = create_goal_for!(other_user, title: "他ユーザーの目標")
-    other_subgoal = create_subgoal!(other_goal, "他ユーザーのサブゴール")
+    other_subgoal = create_subgoal_for!(other_goal, title: "他ユーザーのサブゴール")
+    other_quest = create_quest_for!(other_subgoal, title: "他ユーザーのクエスト")
 
     log_in_as(@user)
 
-    patch subgoal_path(other_subgoal), params: {
-      subgoal: {
-        title: "書き換え",
-        description: other_subgoal.description,
-        position: other_subgoal.position
-      }
+    patch quest_path(other_quest), params: {
+      quest: { title: "書き換え", description: other_quest.description }
     }
 
     assert_response :not_found
-    assert_equal "他ユーザーのサブゴール", other_subgoal.reload.title
+    assert_equal "他ユーザーのクエスト", other_quest.reload.title
+
+    patch complete_quest_path(other_quest), params: {
+      quest: { small_reward_id: @small_reward.id }
+    }
+
+    assert_response :not_found
+    assert_not other_quest.reload.completed?
   end
 
-  test "cannot operate another user's todo item" do
+  test "cannot operate another user's small reward" do
     other_user = create_user!
     other_goal = create_goal_for!(other_user, title: "他ユーザーの目標")
-    other_subgoal = create_subgoal!(other_goal, "他ユーザーのサブゴール")
-    other_todo_item = create_todo_item!(other_subgoal, "他ユーザーのTodo")
+    other_reward = create_small_reward_for!(other_goal, title: "他ユーザーのご褒美")
 
     log_in_as(@user)
 
-    patch todo_item_path(other_todo_item), params: {
-      todo_item: {
-        title: "書き換え",
-        memo: other_todo_item.memo,
-        position: other_todo_item.position
-      }
+    patch small_reward_path(other_reward), params: {
+      small_reward: { title: "書き換え" }
     }
 
     assert_response :not_found
-    assert_equal "他ユーザーのTodo", other_todo_item.reload.title
-  end
-
-  private
-
-  def create_goal!(title)
-    create_goal_for!(create_user!, title: title)
-  end
-
-  def create_subgoal!(goal, title, position: 1)
-    goal.subgoals.create!(
-      title: title,
-      description: "基礎を固めて、自信をつける",
-      position: position,
-      reward_title: "好きなカフェで休む",
-      reward_description: "ここまで進んだ区切り"
-    )
-  end
-
-  def create_todo_item!(subgoal, title)
-    subgoal.todo_items.create!(title: title, memo: "今日 10:45", position: 1)
+    assert_equal "他ユーザーのご褒美", other_reward.reload.title
   end
 end

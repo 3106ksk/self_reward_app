@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :posts
   root "maps#show"
 
   resources :users, only: %i[ new create ]
@@ -16,12 +15,15 @@ Rails.application.routes.draw do
 
   resources :subgoals, only: %i[ create edit update destroy ] do
     patch :claim_reward, on: :member
-    resources :todo_items, only: :create
+    resources :quests, only: :create
   end
 
-  resources :todo_items, only: %i[ create edit update ] do
-    patch :toggle, on: :member
+  resources :quests, only: %i[ create edit update ] do
+    patch :complete, on: :member
+    patch :uncomplete, on: :member
   end
+
+  resources :small_rewards, only: %i[ create edit update ]
 
   get "prototype" => "prototype#home"
   get "prototype/onboarding" => "prototype#onboarding"
@@ -38,5 +40,4 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
 end

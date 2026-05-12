@@ -2,7 +2,8 @@ require "test_helper"
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TodoItem.delete_all
+    Quest.delete_all
+    SmallReward.delete_all
     Subgoal.delete_all
     Goal.delete_all
     User.delete_all

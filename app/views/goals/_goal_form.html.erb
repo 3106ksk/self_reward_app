@@ -10,21 +10,21 @@
       </div>
     <% end %>
 
-    <%= form.label :title, "目標" %>
-    <%= form.text_field :title, placeholder: "Webエンジニアに転職", autocomplete: "off" %>
+    <%= form.label :title, "長期ゴール" %>
+    <%= form.text_field :title, placeholder: "例: 3か月後に小さなRailsアプリを公開する", autocomplete: "off" %>
 
-    <%= form.label :description, "目標の説明" %>
-    <%= form.text_field :description, placeholder: "理想の働き方を手に入れる", autocomplete: "off" %>
+    <%= form.label :description, "長期ゴールの説明、理想状態" %>
+    <%= form.text_field :description, placeholder: "例: どんな状態になればゴール達成か", autocomplete: "off" %>
 
     <%= form.hidden_field :value_statement %>
-    <%= form.submit "目標を更新" %>
+    <%= form.submit "長期ゴールを更新" %>
   <% end %>
 <% else %>
   <form class="goal-map-form">
-    <label>目標</label>
-    <input type="text" placeholder="Webエンジニアに転職">
-    <label>目標の説明</label>
-    <input type="text" placeholder="理想の働き方を手に入れる">
-    <button type="button">目標を更新</button>
+    <label>長期ゴール</label>
+    <input type="text" placeholder="例: 3か月後に小さなRailsアプリを公開する">
+    <label>長期ゴールの説明、理想状態</label>
+    <input type="text" placeholder="例: どんな状態になればゴール達成か">
+    <button type="button">長期ゴールを更新</button>
   </form>
 <% end %>

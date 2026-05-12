@@ -1,5 +1,6 @@
-class TodoItem < ApplicationRecord
-  belongs_to :subgoal, inverse_of: :todo_items
+class Quest < ApplicationRecord
+  belongs_to :subgoal, inverse_of: :quests
+  belongs_to :small_reward, optional: true
 
   validates :title, presence: true
   validates :position, presence: true, numericality: { only_integer: true }
@@ -14,5 +15,13 @@ class TodoItem < ApplicationRecord
 
   def completed?
     completed_at.present?
+  end
+
+  def description
+    memo
+  end
+
+  def description=(value)
+    self.memo = value
   end
 end
