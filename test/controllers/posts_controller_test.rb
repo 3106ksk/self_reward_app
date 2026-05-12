@@ -2,7 +2,14 @@ require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    TodoItem.delete_all
+    Subgoal.delete_all
+    Goal.delete_all
+    User.delete_all
+
+    @user = create_user!
     @post = posts(:one)
+    log_in_as(@user)
   end
 
   test "should get index" do

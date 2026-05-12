@@ -22,6 +22,27 @@
   </head>
 
   <body>
+    <header class="app-nav">
+      <%= link_to "ミチシルベ", root_path, class: "app-nav__brand" %>
+
+      <nav class="app-nav__links">
+        <% if logged_in? %>
+          <%= link_to "マップ", root_path %>
+          <span class="app-nav__user"><%= current_user.name %></span>
+          <%= button_to "ログアウト", logout_path, method: :delete, class: "app-nav__button" %>
+        <% else %>
+          <%= link_to "ログイン", login_path %>
+          <%= link_to "アカウント作成", new_user_path %>
+        <% end %>
+      </nav>
+    </header>
+
+    <div class="flash-stack">
+      <% flash.each do |type, message| %>
+        <div class="flash flash-<%= type %>"><%= message %></div>
+      <% end %>
+    </div>
+
     <main class="app-shell">
       <%= yield %>
     </main>

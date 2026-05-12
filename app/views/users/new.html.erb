@@ -1,0 +1,36 @@
+<% content_for :title, "アカウント作成" %>
+
+<section class="auth-page">
+  <div class="auth-panel">
+    <div class="auth-panel__header">
+      <p>Start</p>
+      <h1>アカウント作成</h1>
+    </div>
+
+    <%= form_with model: @user, url: users_path, class: "goal-map-form auth-form" do |form| %>
+      <% if @user.errors.any? %>
+        <div class="goal-map-form__errors">
+          <% @user.errors.full_messages.each do |message| %>
+            <p><%= message %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= form.label :name, "名前" %>
+      <%= form.text_field :name, autocomplete: "name" %>
+
+      <%= form.label :email, "メールアドレス" %>
+      <%= form.email_field :email, autocomplete: "email" %>
+
+      <%= form.label :password, "パスワード" %>
+      <%= form.password_field :password, autocomplete: "new-password" %>
+
+      <%= form.label :password_confirmation, "パスワード確認" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
+
+      <%= form.submit "アカウントを作成" %>
+    <% end %>
+
+    <%= link_to "ログイン", login_path, class: "auth-panel__link" %>
+  </div>
+</section>

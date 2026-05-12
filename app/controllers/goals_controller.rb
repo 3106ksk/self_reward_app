@@ -20,7 +20,9 @@ class GoalsController < ApplicationController
   private
 
   def set_goal
-    @goal = Goal.find(params.expect(:id))
+    goal_id = params.expect(:id).to_i
+    @goal = current_user.goal
+    raise ActiveRecord::RecordNotFound unless @goal&.id == goal_id
   end
 
   def goal_params

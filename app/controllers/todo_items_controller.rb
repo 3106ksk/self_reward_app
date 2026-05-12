@@ -59,9 +59,9 @@ class TodoItemsController < ApplicationController
 
   def set_subgoal
     @subgoal = if params[:subgoal_id].present?
-      Subgoal.find(params.expect(:subgoal_id))
+      owned_subgoals.find(params.expect(:subgoal_id))
     elsif params.dig(:todo_item, :subgoal_id).present?
-      Subgoal.find(params.dig(:todo_item, :subgoal_id))
+      owned_subgoals.find(params.dig(:todo_item, :subgoal_id))
     else
       default_goal.subgoals.ordered.first || default_goal.subgoals.create!(title: "First checkpoint", position: 1)
     end
@@ -69,13 +69,16 @@ class TodoItemsController < ApplicationController
   end
 
   def set_todo_item
-    @todo_item = TodoItem.find(params.expect(:id))
+    @todo_item = owned_todo_items.find(params.expect(:id))
     @subgoal = @todo_item.subgoal
     @goal = @subgoal.goal
   end
 
   def todo_item_params
     permitted = params.expect(todo_item: [ :title, :memo, :completed_at, :position, :subgoal_id, :completed ])
+    if permitted[:subgoal_id].present?
+      permitted[:subgoal_id] = owned_subgoals.find(permitted[:subgoal_id]).id
+    end
     completed = permitted.delete(:completed)
     permitted[:completed_at] = ActiveModel::Type::Boolean.new.cast(completed) ? Time.current : nil unless completed.nil?
     permitted
@@ -95,11 +98,19 @@ class TodoItemsController < ApplicationController
   end
 
   def default_goal
-    @default_goal ||= Goal.ordered.first_or_create!(
-      title: "Goal Map",
-      value_statement: "Small visible wins compound into the larger reward.",
-      description: "Define the route, add checkpoints, and attach visible next actions."
+    @default_goal ||= current_user.goal || current_user.create_goal!(
+      title: "目標を設定しましょう",
+      value_statement: "今日の一歩が、目指したい未来につながっています。",
+      description: "大きな目標、サブゴール、今日のTodoを設定して、道のりを見える形にしましょう。"
     )
+  end
+
+  def owned_subgoals
+    Subgoal.joins(:goal).where(goals: { user_id: current_user.id })
+  end
+
+  def owned_todo_items
+    TodoItem.joins(subgoal: :goal).where(goals: { user_id: current_user.id })
   end
 
   def render_goal_map_stream(form_frame:, form_partial:, form_locals:, status: :ok)
