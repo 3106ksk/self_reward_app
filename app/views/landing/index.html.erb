@@ -1,0 +1,181 @@
+<% content_for :title, "ミチシルベ | 長期学習のロードマップアプリ" %>
+<% content_for :body_class, "landing-page" %>
+
+<div class="lp-page">
+  <section class="lp-hero" aria-labelledby="lp-hero-title">
+    <div class="lp-hero__inner">
+      <div class="lp-hero__copy">
+        <p class="lp-eyebrow">長期学習のためのロードマップアプリ</p>
+        <h1 id="lp-hero-title" class="lp-title">今日の学習を、未来まで続く道のりに変える。</h1>
+        <p class="lp-lead">
+          価値観・長期ゴール・サブゴール・クエストを一枚のマップでつなぐ、長期学習のロードマップアプリ。
+        </p>
+        <div class="lp-actions" aria-label="主要な操作">
+          <%= link_to "マップを作成する", new_user_path, class: "lp-button" %>
+          <%= link_to "使い方を見る", "#usage", class: "lp-button lp-button--secondary" %>
+        </div>
+      </div>
+
+      <div class="lp-app-preview" aria-label="ミチシルベの学習マップ例">
+        <aside class="lp-app-preview__sidebar" aria-label="学習マップのメニュー">
+          <div class="lp-app-preview__brand">
+            <%= image_tag "landing/compass-mark.png", alt: "", class: "h-8 w-8 rounded-md" %>
+            <span>ミチシルベ</span>
+          </div>
+          <nav class="lp-app-preview__nav" aria-label="マップ要素">
+            <span>価値観</span>
+            <span>長期ゴール</span>
+            <span>サブゴール</span>
+            <span>クエスト</span>
+            <span>ご褒美</span>
+          </nav>
+        </aside>
+
+        <div class="lp-app-preview__map">
+          <div class="lp-map-preview">
+            <%= image_tag "landing/map-scene.png",
+              alt: "価値観、現在地、サブゴール、クエスト、ご褒美、長期ゴールが道でつながった学習マップの画面例",
+              class: "h-full min-h-[420px] w-full rounded-lg object-cover opacity-80" %>
+            <span class="lp-map-node lp-map-node--value">価値観パネル</span>
+            <span class="lp-map-node lp-map-node--current">現在地</span>
+            <span class="lp-map-node lp-map-node--subgoal">サブゴール</span>
+            <span class="lp-map-node lp-map-node--quest">クエスト</span>
+            <span class="lp-map-node lp-map-node--small-reward">小さなご褒美</span>
+            <span class="lp-map-node lp-map-node--reward">大きなご褒美</span>
+            <span class="lp-map-node lp-map-node--goal">長期ゴール</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="concept" class="lp-section lp-problem-band lp-band lp-problem" aria-labelledby="lp-problem-title">
+    <div class="lp-container lp-split">
+      <div class="lp-problem-band__column">
+        <p class="lp-eyebrow">コンセプト</p>
+        <h2 id="lp-problem-title">頑張っているのに、進んでいる実感が持てない。</h2>
+        <ul class="mt-6 space-y-3 text-sm leading-7 text-slate-300">
+          <li>毎日タスクをこなしても、どこへ向かっているか分からなくなる。</li>
+          <li>目標が遠くて、今日の一歩とのつながりが見えにくい。</li>
+          <li>続けているのに、前進した実感だけが残りにくい。</li>
+        </ul>
+      </div>
+      <div class="lp-problem-band__column">
+        <p class="lp-eyebrow">考え方</p>
+        <h2>Todoを増やすより、進んでいる方向を見失わない。</h2>
+        <ul class="mt-6 space-y-3 text-sm leading-7 text-slate-300">
+          <li>価値観、長期ゴール、サブゴールを一枚の道に置く。</li>
+          <li>クエストを、未来につながる通過条件として確認する。</li>
+          <li>ご褒美で小さな前進を認め、長い学習を続けやすくする。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="usage" class="lp-section lp-usage-flow" aria-labelledby="lp-usage-title">
+    <div class="lp-container">
+      <p class="lp-eyebrow">使い方</p>
+      <h2 id="lp-usage-title">使い方は、道のりを置いて、進んだ地点を確認するだけ。</h2>
+
+      <div class="lp-flow" role="list">
+        <article class="lp-flow-item" role="listitem">
+          <div class="lp-flow-icon" aria-hidden="true">心</div>
+          <h3>価値観</h3>
+          <p>なぜ、この道を進みたいのか</p>
+        </article>
+        <span class="lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="lp-flow-item" role="listitem">
+          <div class="lp-flow-icon" aria-hidden="true">旗</div>
+          <h3>長期ゴール</h3>
+          <p>最終的に到達したい場所</p>
+        </article>
+        <span class="lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="lp-flow-item" role="listitem">
+          <div class="lp-flow-icon" aria-hidden="true">道</div>
+          <h3>サブゴール</h3>
+          <p>道のりを通過点に分ける</p>
+        </article>
+        <span class="lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="lp-flow-item" role="listitem">
+          <div class="lp-flow-icon" aria-hidden="true">印</div>
+          <h3>クエスト</h3>
+          <p>できるようになりたい条件を置く</p>
+        </article>
+        <span class="lp-flow-arrow" aria-hidden="true">→</span>
+        <article class="lp-flow-item" role="listitem">
+          <div class="lp-flow-icon" aria-hidden="true">星</div>
+          <h3>ご褒美</h3>
+          <p>前進を認めて自分をいたわる</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="lp-section lp-setup lp-band" aria-labelledby="lp-setup-title">
+    <div class="lp-container lp-setup__layout">
+      <div class="lp-setup__intro">
+        <p class="lp-eyebrow">初期設定</p>
+        <h2 id="lp-setup-title">最初に作るのは、あなた専用の学習マップ。</h2>
+        <p class="lp-lead">以下の5ステップで、あなただけの道のりをつくりましょう。</p>
+        <p class="lp-lead">最初は仮の内容でも大丈夫。学習しながら、あとで何度でも見直せます。</p>
+      </div>
+
+      <div class="lp-setup__timeline lp-steps" role="list">
+        <article class="lp-step" role="listitem">
+          <div class="lp-step__number" aria-hidden="true">01</div>
+          <div>
+            <h3>価値観を書く</h3>
+            <p>その学習を通して、どんな未来を実現したいかを書き残します。</p>
+          </div>
+          <div class="lp-step__preview" aria-hidden="true"></div>
+        </article>
+        <article class="lp-step" role="listitem">
+          <div class="lp-step__number" aria-hidden="true">02</div>
+          <div>
+            <h3>長期ゴールを置く</h3>
+            <p>最終的に到達したい目標を設定します。いつか叶えたい未来を描きます。</p>
+          </div>
+          <div class="lp-step__preview" aria-hidden="true"></div>
+        </article>
+        <article class="lp-step" role="listitem">
+          <div class="lp-step__number" aria-hidden="true">03</div>
+          <div>
+            <h3>サブゴールに分ける</h3>
+            <p>長期ゴールまでの道のりを、いくつかの通過点に分けます。</p>
+          </div>
+          <div class="lp-step__preview" aria-hidden="true"></div>
+        </article>
+        <article class="lp-step" role="listitem">
+          <div class="lp-step__number" aria-hidden="true">04</div>
+          <div>
+            <h3>クエストを作る</h3>
+            <p>各サブゴールで達成したいことを、クエストとして具体的に置きます。</p>
+          </div>
+          <div class="lp-step__preview" aria-hidden="true"></div>
+        </article>
+        <article class="lp-step" role="listitem">
+          <div class="lp-step__number" aria-hidden="true">05</div>
+          <div>
+            <h3>ご褒美を用意する</h3>
+            <p>小さなご褒美と大きなご褒美を決めて、前進を楽しみに変えます。</p>
+          </div>
+          <div class="lp-step__preview" aria-hidden="true"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="lp-section lp-final-cta lp-final" aria-labelledby="lp-final-title">
+    <div class="lp-container">
+      <p class="lp-eyebrow">マップをはじめる</p>
+      <h2 id="lp-final-title">まずは、目指す未来と最初の中継地点を置く。</h2>
+      <p class="lp-lead">
+        完璧な計画はいりません。道を置き、確認しながら進めば大丈夫。ミチシルベが、あなたの長い旅を支えます。
+      </p>
+      <div class="lp-actions" aria-label="開始とログイン">
+        <%= link_to "無料でマップを作成する", new_user_path, class: "lp-button" %>
+        <%= link_to "ログインはこちら", login_path, class: "lp-button lp-button--secondary" %>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,75 @@
+<% quest ||= nil %>
+<% quest_record = quest || (defined?(Quest) ? Quest.new : nil) %>
+<% goal_record = local_assigns[:goal] || quest_record&.try(:subgoal)&.try(:goal) %>
+<% subgoals = Array(goal_record&.try(:subgoals)).select { |subgoal| subgoal.try(:persisted?) } %>
+<% small_rewards = Array(goal_record&.try(:small_rewards)).select { |small_reward| small_reward.try(:persisted?) } %>
+<% selected_subgoal = quest_record&.try(:subgoal) || subgoals.first %>
+<% description_attribute = quest_record&.respond_to?(:description) ? :description : :memo %>
+<% form_url = if quest_record&.try(:persisted?) && respond_to?(:quest_path)
+  quest_path(quest_record)
+elsif selected_subgoal&.try(:persisted?) && respond_to?(:subgoal_quests_path)
+  subgoal_quests_path(selected_subgoal)
+else
+  "#"
+end %>
+
+<% if quest_record %>
+  <%= form_with model: quest_record, url: form_url, method: (quest_record.persisted? ? :patch : :post), class: "goal-map-form", data: { turbo_frame: "quest_form" } do |form| %>
+    <% if quest_record.errors.any? %>
+      <div class="goal-map-form__errors">
+        <% quest_record.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form.label :title, "クエスト名" %>
+    <%= form.text_field :title, placeholder: "例: ユーザー登録画面を作る", autocomplete: "off" %>
+
+    <%= form.label description_attribute, "説明、メモ" %>
+    <%= form.text_area description_attribute, rows: 3, placeholder: "例: クリア条件や具体的な進め方", autocomplete: "off" %>
+
+    <% unless quest_record.persisted? %>
+      <label for="quest-subgoal-select">関係するサブゴール選択</label>
+      <select id="quest-subgoal-select" class="goal-map-form__select" data-goal-map-target="questSubgoalSelect" data-action="change->goal-map#changeQuestSubgoal">
+        <% subgoals.each do |subgoal| %>
+          <% create_path = respond_to?(:subgoal_quests_path) ? subgoal_quests_path(subgoal) : "#" %>
+          <option value="<%= create_path %>" <%= "selected" if subgoal == selected_subgoal %>>
+            <%= subgoal.title %>
+          </option>
+        <% end %>
+      </select>
+    <% end %>
+
+    <%= form.submit quest_record.persisted? ? "更新" : "クエストを追加" %>
+  <% end %>
+
+  <% if quest_record.persisted? %>
+    <% if quest_record.completed? %>
+      <% if quest_record.try(:small_reward).present? %>
+        <p class="goal-map-form__note">小さなご褒美: <%= quest_record.small_reward.title %></p>
+      <% end %>
+      <% if respond_to?(:uncomplete_quest_path) %>
+        <%= button_to "未クリアに戻す", uncomplete_quest_path(quest_record), method: :patch, class: "goal-map-form__danger-button", form: { data: { turbo_frame: "goal-map-board" } } %>
+      <% end %>
+    <% elsif small_rewards.any? && respond_to?(:complete_quest_path) %>
+      <%= form_with model: quest_record, url: complete_quest_path(quest_record), method: :patch, class: "goal-map-form", data: { turbo_frame: "quest_form" } do |complete_form| %>
+        <%= complete_form.label :small_reward_id, "小さなご褒美" %>
+        <%= complete_form.collection_select :small_reward_id, small_rewards, :id, :title, {}, class: "goal-map-form__select" %>
+        <%= complete_form.submit "クリアする" %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <form class="goal-map-form">
+    <label>クエスト名</label>
+    <input type="text" placeholder="例: ユーザー登録画面を作る">
+    <label>説明、メモ</label>
+    <textarea rows="3" placeholder="例: クリア条件や具体的な進め方"></textarea>
+    <label>対象のサブゴール</label>
+    <select class="goal-map-form__select">
+      <option>サブゴールを追加してください</option>
+    </select>
+    <button type="button">クエストを追加</button>
+  </form>
+<% end %>

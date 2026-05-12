@@ -1,0 +1,16 @@
+<% content_for :title, "ミチシルベ" %>
+
+<div class="goal-map-page" data-controller="goal-map">
+  <%= render "maps/panel",
+    goal: defined?(@goal) ? @goal : nil,
+    subgoal: defined?(@subgoal) ? @subgoal : nil,
+    quest: defined?(@quest) ? @quest : nil,
+    small_reward: defined?(@small_reward) ? @small_reward : nil %>
+
+  <%= turbo_frame_tag "goal-map-board", class: "goal-map-board-frame" do %>
+    <%= render "maps/map",
+      goal: defined?(@goal) ? @goal : nil,
+      subgoals: defined?(@subgoals) ? @subgoals : [],
+      quests: defined?(@quests) ? @quests : [] %>
+  <% end %>
+</div>

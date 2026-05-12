@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html data-controller="transit-prototype">
   <head>
-    <title><%= content_for(:title) || "Myapp" %></title>
+    <title><%= content_for(:title) || "ミチシルベ" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -17,13 +17,46 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <% body_class = content_for?(:body_class) ? yield(:body_class).to_s : "" %>
+  <% landing_page = body_class.include?("landing-page") %>
+  <body class="<%= body_class %>">
+    <header class="app-nav <%= "app-nav--landing" if landing_page %>">
+      <%= link_to root_path, class: "app-nav__brand" do %>
+        <% if landing_page %>
+          <%= image_tag "landing/compass-mark.png", alt: "", class: "app-nav__brand-mark" %>
+        <% end %>
+        <span>ミチシルベ</span>
+      <% end %>
+
+      <nav class="app-nav__links">
+        <% if logged_in? %>
+          <%= link_to "マップ", map_path %>
+          <span class="app-nav__user"><%= current_user.name %></span>
+          <%= button_to "ログアウト", logout_path, method: :delete, class: "app-nav__button" %>
+        <% elsif landing_page %>
+          <%= link_to "コンセプト", "#concept" %>
+          <%= link_to "使い方", "#usage" %>
+          <%= link_to "機能", "#features" %>
+          <%= link_to "ログイン", login_path %>
+          <%= link_to "マップを作成する", new_user_path, class: "app-nav__cta" %>
+        <% else %>
+          <%= link_to "ログイン", login_path %>
+          <%= link_to "アカウント作成", new_user_path %>
+        <% end %>
+      </nav>
+    </header>
+
+    <div class="flash-stack">
+      <% flash.each do |type, message| %>
+        <div class="flash flash-<%= type %>"><%= message %></div>
+      <% end %>
+    </div>
+
+    <main class="app-shell">
       <%= yield %>
     </main>
   </body>

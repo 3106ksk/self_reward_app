@@ -1,0 +1,74 @@
+<% subgoal ||= nil %>
+<% subgoal_record = subgoal || (defined?(Subgoal) ? Subgoal.new : nil) %>
+<% goal_record = local_assigns[:goal] || subgoal_record&.try(:goal) %>
+<% max_subgoals = defined?(Subgoal::MAX_PER_GOAL) ? Subgoal::MAX_PER_GOAL : 5 %>
+<% subgoal_count = goal_record&.try(:subgoals)&.count.to_i %>
+<% max_reached = subgoal_record && !subgoal_record.persisted? && subgoal_count >= max_subgoals %>
+<% form_url = if subgoal_record&.try(:persisted?) && respond_to?(:subgoal_path)
+  subgoal_path(subgoal_record)
+elsif goal_record&.try(:persisted?) && respond_to?(:goal_subgoals_path)
+  goal_subgoals_path(goal_record)
+else
+  "#"
+end %>
+
+<% if subgoal_record %>
+  <%= form_with model: subgoal_record, url: form_url, method: (subgoal_record.persisted? ? :patch : :post), class: "goal-map-form", data: { turbo_frame: "subgoal_form" } do |form| %>
+    <% if subgoal_record.errors.any? %>
+      <div class="goal-map-form__errors">
+        <% subgoal_record.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+    <% if subgoal_record.persisted? %>
+      <div class="goal-map-form__mode">
+        <span>編集中</span>
+        <strong><%= subgoal_record.reward_label %></strong>
+        <small>サブゴールと大きなご褒美をここで編集できます</small>
+      </div>
+    <% elsif max_reached %>
+      <p class="goal-map-form__note goal-map-form__note--limit">サブゴールは最大<%= max_subgoals %>つまでです。追加するには、不要なサブゴールを削除してください。</p>
+    <% end %>
+    <%= form.label :title, "サブゴール名" %>
+    <%= form.text_field :title, placeholder: "例: 最初の機能を画面で動かせるようにする", autocomplete: "off" %>
+    <%= form.label :description, "説明、メモ" %>
+    <%= form.text_field :description, placeholder: "例: このサブゴールで到達したい状態", autocomplete: "off" %>
+    <%= form.label :reward_title, "大きなご褒美" %>
+    <%= form.text_field :reward_title, placeholder: "例: 達成したら受け取れるご褒美", autocomplete: "off" %>
+    <%= form.label :reward_description, "大きなご褒美の説明、メモ" %>
+    <%= form.text_field :reward_description, placeholder: "例: いつ、どんな気持ちで受け取るか", autocomplete: "off" %>
+    <% if subgoal_record.persisted? && subgoal_record.reward_claimed? %>
+      <p class="goal-map-form__note">この大きなご褒美は獲得済みです。</p>
+    <% elsif subgoal_record.persisted? && subgoal_record.reward_available? %>
+      <p class="goal-map-form__note">サブゴール達成。大きなご褒美を獲得できます。</p>
+    <% end %>
+    <%= form.submit subgoal_record.persisted? ? "更新" : "サブゴールを追加", disabled: max_reached %>
+  <% end %>
+  <% if subgoal_record.persisted? %>
+    <%= button_to "サブゴールを削除",
+      subgoal_path(subgoal_record),
+      method: :delete,
+      class: "goal-map-form__danger-button",
+      form: { data: { turbo_confirm: "このサブゴールと紐づくクエストを削除します。よろしいですか？" } } %>
+  <% end %>
+  <% if subgoal_record.persisted? && subgoal_record.reward_available? %>
+    <%= button_to "大きなご褒美を獲得する",
+      claim_reward_subgoal_path(subgoal_record),
+      method: :patch,
+      class: "goal-map-form__secondary-button",
+      form: { data: { turbo_frame: "goal-map-board" } } %>
+  <% end %>
+<% else %>
+  <form class="goal-map-form">
+    <label>サブゴール名</label>
+    <input type="text" placeholder="例: 最初の機能を画面で動かせるようにする">
+    <label>説明、メモ</label>
+    <input type="text" placeholder="例: このサブゴールで到達したい状態">
+    <label>大きなご褒美</label>
+    <input type="text" placeholder="例: 達成したら受け取れるご褒美">
+    <label>大きなご褒美の説明、メモ</label>
+    <input type="text" placeholder="例: いつ、どんな気持ちで受け取るか">
+    <button type="button">サブゴールを追加</button>
+  </form>
+<% end %>
