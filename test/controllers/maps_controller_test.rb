@@ -17,8 +17,8 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     @quest = create_quest_for!(@subgoal, title: "RailsガイドでMVCの流れを確認する")
   end
 
-  test "redirects root to login when logged out" do
-    get root_path
+  test "redirects map to login when logged out" do
+    get map_path
 
     assert_redirected_to login_path
   end
@@ -26,7 +26,7 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
   test "shows the goal map with quest and reward language only" do
     log_in_as(@user)
 
-    get root_path
+    get map_path
 
     assert_response :success
     assert_match "ミチシルベ", response.body
@@ -50,7 +50,7 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(user)
 
     assert_difference("Goal.count", 1) do
-      get root_path
+      get map_path
     end
 
     assert_response :success
@@ -60,7 +60,7 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
     assert_equal expected_description, goal.description
 
     assert_no_difference("Goal.count") do
-      get root_path
+      get map_path
     end
   end
 
@@ -109,7 +109,7 @@ class MapsControllerTest < ActionDispatch::IntegrationTest
   test "subgoal and quest forms do not expose position or forbidden copy" do
     log_in_as(@user)
 
-    get root_path
+    get map_path
 
     assert_response :success
     assert_no_match(/name="subgoal\[position\]"/, response.body)

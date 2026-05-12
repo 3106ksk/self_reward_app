@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     if @user.save
       reset_session
       session[:user_id] = @user.id
-      redirect_to root_path, success: "アカウントを作成しました。"
+      redirect_to map_path, success: "アカウントを作成しました。"
     else
       flash.now[:alert] = "アカウント作成に失敗しました。"
       render :new, status: :unprocessable_entity

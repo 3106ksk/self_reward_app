@@ -21,15 +21,28 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <header class="app-nav">
-      <%= link_to "ミチシルベ", root_path, class: "app-nav__brand" %>
+  <% body_class = content_for?(:body_class) ? yield(:body_class).to_s : "" %>
+  <% landing_page = body_class.include?("landing-page") %>
+  <body class="<%= body_class %>">
+    <header class="app-nav <%= "app-nav--landing" if landing_page %>">
+      <%= link_to root_path, class: "app-nav__brand" do %>
+        <% if landing_page %>
+          <%= image_tag "landing/compass-mark.png", alt: "", class: "app-nav__brand-mark" %>
+        <% end %>
+        <span>ミチシルベ</span>
+      <% end %>
 
       <nav class="app-nav__links">
         <% if logged_in? %>
-          <%= link_to "マップ", root_path %>
+          <%= link_to "マップ", map_path %>
           <span class="app-nav__user"><%= current_user.name %></span>
           <%= button_to "ログアウト", logout_path, method: :delete, class: "app-nav__button" %>
+        <% elsif landing_page %>
+          <%= link_to "コンセプト", "#concept" %>
+          <%= link_to "使い方", "#usage" %>
+          <%= link_to "機能", "#features" %>
+          <%= link_to "ログイン", login_path %>
+          <%= link_to "マップを作成する", new_user_path, class: "app-nav__cta" %>
         <% else %>
           <%= link_to "ログイン", login_path %>
           <%= link_to "アカウント作成", new_user_path %>

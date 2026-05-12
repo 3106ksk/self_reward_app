@@ -9,7 +9,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     User.delete_all
   end
 
-  test "creates user, logs in, and redirects to root" do
+  test "creates user, logs in, and redirects to map" do
     assert_difference("User.count", 1) do
       post users_path, params: {
         user: {
@@ -22,7 +22,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     user = User.find_by!(email: "new-user@example.com")
-    assert_redirected_to root_path
+    assert_redirected_to map_path
     assert_equal user.id, session[:user_id]
   end
 end

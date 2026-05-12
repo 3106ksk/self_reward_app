@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root "maps#show"
+  root "landing#index"
 
   resources :users, only: %i[ new create ]
 

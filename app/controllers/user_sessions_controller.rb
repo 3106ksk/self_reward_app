@@ -9,7 +9,7 @@ class UserSessionsController < ApplicationController
     if user&.authenticate(params[:password])
       reset_session
       session[:user_id] = user.id
-      redirect_to root_path, success: "ログインしました。"
+      redirect_to map_path, success: "ログインしました。"
     else
       flash.now[:alert] = "メールアドレスまたはパスワードが正しくありません。"
       render :new, status: :unprocessable_entity

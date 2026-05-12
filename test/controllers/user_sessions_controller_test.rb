@@ -14,7 +14,7 @@ class UserSessionsControllerTest < ActionDispatch::IntegrationTest
   test "logs in with valid credentials" do
     post login_path, params: { email: @user.email, password: "password123" }
 
-    assert_redirected_to root_path
+    assert_redirected_to map_path
     assert_equal @user.id, session[:user_id]
   end
 
