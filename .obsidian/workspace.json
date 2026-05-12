@@ -185,6 +185,8 @@
   },
   "active": "3ae27c833a8f396b",
   "lastOpenFiles": [
+    "test/test_helper.rb",
+    "test/models/goal_map_test.rb",
     "tmp/pids/server.pid",
     "tmp/cache/bootsnap/compile-cache-iseq/34/153ac164298d9c",
     "tmp/cache/bootsnap/compile-cache-iseq/ba/c189f711ba990d",
@@ -194,8 +196,6 @@
     "tmp/cache/bootsnap/compile-cache-iseq/48/eb791f30a1e1f3",
     "tmp/cache/bootsnap/compile-cache-iseq/2c/e9b1c0013c652f",
     "tmp/cache/bootsnap/compile-cache-iseq/ab/01b727548db8ad",
-    "tmp/cache/bootsnap/compile-cache-iseq/33/e7f83bc3a8900b",
-    "tmp/cache/bootsnap/compile-cache-iseq/86/3e14f6db2d0370",
     "docs/mvp_implementation_prompt.md",
     "docs/mvp_implementation_design.md",
     "docs/concept_decision_log.md",
