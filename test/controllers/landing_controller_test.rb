@@ -7,23 +7,22 @@ class LandingControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "今日の学習を、未来まで続く道のりに変える。", response.body
     assert_match "長期学習のためのロードマップアプリ", response.body
-    assert_match "頑張っているのに、進んでいる実感が持てない。", response.body
-    assert_match "使い方は、道のりを置いて、進んだ地点を確認するだけ。", response.body
-    assert_match "なぜ、この道を進みたいのか", response.body
-    assert_match "できるようになりたい条件を置く", response.body
-    assert_match "最初に作るのは、あなた専用の学習マップ。", response.body
-    assert_match "以下の5ステップで、あなただけの道のりをつくりましょう。", response.body
-    assert_match "最初は仮の内容でも大丈夫。学習しながら、あとで何度でも見直せます。", response.body
-    assert_match "まずは、目指す未来と最初の中継地点を置く。", response.body
-    assert_match "完璧な計画はいりません。道を置き、確認しながら進めば大丈夫。ミチシルベが、あなたの長い旅を支えます。", response.body
-    assert_match 'href="#concept"', response.body
-    assert_match 'href="#usage"', response.body
-    assert_match 'href="#features"', response.body
+    assert_match "lp-concept-band-reference", response.body
+    assert_match "頑張っているのに、進んでいる実感が持てない。Todoを増やすより、進んでいる方向を見失わない。", response.body
+    assert_match 'href="/users/new"', response.body
+    assert_match 'href="/login"', response.body
     assert_match 'id="concept"', response.body
-    assert_match 'id="usage"', response.body
-    assert_match 'id="features"', response.body
-    assert_match "使い方を見る", response.body
-    assert_match "クエスト", response.body
+    assert_no_match 'id="usage"', response.body
+    assert_no_match 'id="features"', response.body
+    assert_no_match "lp-app-preview", response.body
+    assert_no_match "lp-map-board", response.body
+    assert_no_match "lp-single__column", response.body
+    assert_no_match "lp-single__route", response.body
+    assert_no_match "使い方は、道のりを置いて、進んだ地点を確認するだけ。", response.body
+    assert_no_match "下へスクロールして、使い方を見る", response.body
+    assert_no_match 'href="#lp-final-cta"', response.body
+    assert_no_match "lp-image-preview", response.body
+    assert_no_match "lp-reference-mock.png", response.body
     assert_no_match "クエストは、今日やるTodoではなく", response.body
     assert_no_match "lp-reference", response.body
     assert_no_match "lp-reference-full.png", response.body
