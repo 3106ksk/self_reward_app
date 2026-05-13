@@ -38,9 +38,9 @@
           <span class="app-nav__user"><%= current_user.name %></span>
           <%= button_to "ログアウト", logout_path, method: :delete, class: "app-nav__button" %>
         <% elsif landing_page %>
-          <%= link_to "コンセプト", "#concept" %>
-          <%= link_to "使い方", "#usage" %>
-          <%= link_to "機能", "#features" %>
+          <%= link_to "コンセプト", root_path %>
+          <%= link_to "使い方", root_path %>
+          <%= link_to "機能", root_path %>
           <%= link_to "ログイン", login_path %>
           <%= link_to "マップを作成する", new_user_path, class: "app-nav__cta" %>
         <% else %>
